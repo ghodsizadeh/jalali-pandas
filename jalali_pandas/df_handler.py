@@ -5,7 +5,7 @@ import pandas as pd
 import jdatetime
 
 # pylint: disable=unused-import
-from .serie_handler import JalaliSerieAccessor
+# from .serie_handler import JalaliSerieAccessor
 
 
 @pd.api.extensions.register_dataframe_accessor("jalali")
