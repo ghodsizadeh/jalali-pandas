@@ -1,0 +1,17 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+-   repo: https://github.com/psf/black
+    rev: 21.10b0
+    hooks:
+    -   id: black
+
+-   repo: https://github.com/pycqa/pylint
+    rev: v2.11.1
+    hooks:
+    -   id: pylint
+        args: [--rcfile=.pylintrc]
