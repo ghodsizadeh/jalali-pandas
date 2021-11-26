@@ -4,7 +4,5 @@ jobs:
   test-jalali-pandas:
     runs-on: ubuntu-latest
     steps:
-    - name: Pytest Coverage Commentator
-      uses: coroo/pytest-coverage-commentator@v1.0.2
-      with:
-        pytest-coverage: pytest-coverage.txt
+      - name: pytester-cov
+        uses: althecoderguy/pytester-cov@v1.2.1
