@@ -9,3 +9,6 @@ This repository is a place to store pandas extension that handle jalali dates.
 - [ ] add support for sampling
 - [x] add date parser from other columns
 - [x] add date parser from string
+
+<!-- Pytest Coverage Comment:Begin -->
+<!-- Pytest Coverage Comment:End -->
