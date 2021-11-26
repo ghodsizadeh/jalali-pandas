@@ -1,11 +1,13 @@
 """
 handle jalaali dates in pandas dataframes
 """
+from typing import List, Union
 import pandas as pd
 import jdatetime
 
 # pylint: disable=unused-import
 # from .serie_handler import JalaliSerieAccessor
+LSTR = List[str]
 
 
 @pd.api.extensions.register_dataframe_accessor("jalali")
@@ -14,6 +16,8 @@ class JalaliDataframeAccessor:
     Accessor methods on pandas series to handle jalali dates
 
     """
+
+    TEMP_COLUMNS = ["__year", "__month", "__quarter", "__weekday", "__day"]
 
     def __init__(self, pandas_obj: pd.DataFrame):
         """[summary]
@@ -24,10 +28,9 @@ class JalaliDataframeAccessor:
         self._obj = pandas_obj  # type: pd.DataFrame
         self.columns = self._obj.columns  # type: pd.Index
         self.jdate = "jdate"
-        self._validate()
-        self.prepare()
+        self.__validate()
 
-    def _validate(self):
+    def __validate(self):
         """
         check if the pandas object is a dataframe with a jdatetime on it
 
@@ -41,18 +44,39 @@ class JalaliDataframeAccessor:
                 return
         raise ValueError("No jdatetime column found in the dataframe.")
 
-    def prepare(self) -> pd.DataFrame:
+    @property
+    def __df(self) -> pd.DataFrame:
         """Genreate temp data frame for the groupby
 
         Returns:
             pd.DataFrame: a dataframe with year, month, day, week, dayofweek, dayofmonth
         """
+        df = self._obj.copy()
+        df["__year"] = df[self.jdate].jalali.year
+        df["__month"] = df[self.jdate].jalali.month
+        df["__day"] = df[self.jdate].jalali.day
+        df["__quarter"] = df[self.jdate].jalali.quarter
+        df["__weekday"] = df[self.jdate].jalali.weekday
 
-        df["year"] = df[self.jdate].jalali.year
-        df["month"] = df[self.jdate].jalali.month
-        df["day"] = df[self.jdate].jalali.year
+        return df
 
-    def groupby(self, kind="md") -> pd.Grouper:
+    #  a function that get str or list of str
+
+    def __clean_groupby(self, group: pd.Grouper) -> pd.Grouper:
+        """
+        clean the groupby object
+
+        Args:
+            group (pd.Grouper): [description]
+
+        Returns:
+            pd.Grouper: [description]
+        """
+        remaining_columns = list(set(self.columns).difference(self.TEMP_COLUMNS))
+        # breakpoint
+        return group[remaining_columns]
+
+    def groupby(self, grouper: Union[str, LSTR] = "md") -> pd.Grouper:
         """
         groupby jalali date
 
@@ -62,37 +86,44 @@ class JalaliDataframeAccessor:
         Returns:
             pd.Grouper: [description]
         """
-        group = self._obj
+        possible_keys = [
+            "year",
+            "month",
+            "day",
+            "week",
+            "dayofweek",
+            "dayofmonth",
+            "ym",
+            "yq",
+            "ymd",
+            "md",
+        ]
+        df = self.__df
+        if grouper not in possible_keys:
+            raise ValueError(
+                f"{grouper} is not a valid groupby type. Choose from {possible_keys}"
+            )
 
-        if kind == "md":
-            group = self._obj.groupby(self._obj[self.jdate].jalali.month)
-        elif kind == "wd":
-            group = self._obj.groupby(self._obj[self.jdate].jalali.dayofweek)
-        elif kind == "wd":
-            group = self._obj.groupby(self._obj[self.jdate].jalali.dayofweek)
+        keys = {
+            "md": ["month", "day"],
+            "ym": ["year", "month"],
+            "yq": ["year", "quarter"],
+            "ymd": ["year", "month", "day"],
+        }
+        if grouper in keys:
+            grouper = keys[grouper]
+            grouper = [f"__{g}" for g in grouper]
         else:
-            raise ValueError("kind must be one of 'md','wd','d'")
+            grouper = [f"__{grouper}"]
 
+        group = df.groupby(grouper)
+        group = self.__clean_groupby(group)
         return group
 
-    def resample(self):
+    def resample(self, resample_type: str) -> pd.DataFrame:
         """[summary]
 
         Raises:
             NotImplementedError: [description]
         """
         raise NotImplementedError
-
-
-if __name__ == "__main__":
-    df = pd.DataFrame(
-        {
-            "date": pd.date_range("2019-01-01", periods=10, freq="D"),
-            "temperature": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        }
-    )
-
-    df["hdate"] = df.date.jalali.to_jalali()
-    res = df.jalali.groupby("md")
-    print(res)
-    print(df.head(1))
