@@ -1,8 +1,10 @@
 name: test-jalali-pandas
-on: [push]
+on: [push,  pull_request]
 jobs:
   test-jalali-pandas:
     runs-on: ubuntu-latest
     steps:
     - name: Pytest Coverage Commentator
       uses: coroo/pytest-coverage-commentator@v1.0.2
+      with:
+        pytest-coverage: pytest-coverage.txt
