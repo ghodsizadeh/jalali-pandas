@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "jalali_pandas"
+version = "0.1.0"
+description = "A Pandas extension to make work with Jalali Date easier."
+authors = ["Mehdi Ghodsizadeh <mehdi.ghodsizadeh@gmail.com>"]
+license = "BSD 3-Clause License"
+
+[tool.poetry.dependencies]
+python = "^3.8.9"
+jdatetime = "^3.6.4"
+
+[tool.poetry.dev-dependencies]
+black = "^21.11b1"
+pytest = "^6.2.5"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
