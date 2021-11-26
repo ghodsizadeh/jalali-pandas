@@ -21,17 +21,15 @@ class JalaliSerieAccessor:
         # self._validate(pandas_obj)
         self._obj = pandas_obj
 
-    def _validate(self):
+    def __validate(self):
         """validate pandas series is datetime or not.
 
         Raises:
             TypeError: [description]
         """
-        if not isinstance(self._obj, pd.Series):
-            raise TypeError("pandas series is required")
 
         if not all(isinstance(x, (str, jdatetime.date)) for x in self._obj):
-            raise TypeError("pandas series must be jdatetime")
+            raise TypeError("pandas series must be jdatetime or string of jdate")
 
     def to_jalali(self) -> pd.Series:
         """convert python datetime to jalali datetime.
@@ -69,7 +67,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali year
         """
-        self._validate()
+        self.__validate()
         return self._obj.apply(lambda x: x.year)
 
     @property
@@ -80,7 +78,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali month
         """
-        self._validate()
+        self.__validate()
         return self._obj.apply(lambda x: x.month)
 
     @property
@@ -90,7 +88,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali day
         """
-        self._validate()
+        self.__validate()
         return self._obj.apply(lambda x: x.day)
 
     @property
@@ -100,7 +98,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali hour
         """
-        self._validate()
+        self.__validate()
         return self._obj.apply(lambda x: x.hour)
 
     @property
@@ -110,7 +108,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali minute
         """
-        self._validate()
+        self.__validate()
         return self._obj.apply(lambda x: x.minute)
 
     @property
@@ -120,7 +118,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali second
         """
-        self._validate()
+        self.__validate()
         return self._obj.apply(lambda x: x.second)
 
     @property
@@ -130,7 +128,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali weekday
         """
-        self._validate()
+        self.__validate()
         return self._obj.apply(lambda x: x.weekday())
 
     @property
@@ -140,7 +138,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali day of year
         """
-        self._validate()
+        self.__validate()
         return self._obj.apply(lambda x: x.weeknumber())
 
     @property
@@ -150,13 +148,6 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali quarter
         """
-        self._validate()
+        self.__validate()
         month = self.month
         return month.apply(lambda x: (x - 1) // 3 + 1)
-
-
-if __name__ == "__main__":
-    df = pd.DataFrame({"date": pd.date_range("2019-01-01", "2019-01-31")})
-    df["jdate"] = df.date.jalali.to_jalali()
-    print(all(df["date"] == df.jdate.jalali.to_georgian()))
-    print(jdatetime.datetime.strptime("1396-01-01", "%Y-%m-%d"))

@@ -2,7 +2,11 @@
 """
 import jdatetime
 import pandas as pd
-from jalali_pandas import JalaliSerieAccessor  # pylint: disable=W0611
+import pytest
+from jalali_pandas import (  # pylint: disable=W0611
+    JalaliDataframeAccessor,
+    JalaliSerieAccessor,
+)
 
 
 class TestJalaliSerie:
@@ -25,6 +29,22 @@ class TestJalaliSerie:
         assert df["jdate"].iloc[0] == jdatetime.datetime(year=1397, month=10, day=11)
         assert df["date"].iloc[0] == pd.Timestamp("2019-01-01")
 
+    def test_georgian_convertor(self):
+        """Test jalali convertor from jalali to georgian"""
+
+        df = self.df
+        df["gdate"] = df["jdate"].jalali.to_georgian()
+        date = df["gdate"].iloc[0]
+        assert date.year == 2019, "year is not 2019"
+        assert date.month == 1, "month is not 1"
+        assert date.day == 1, "day is not 1"
+
+    def test_on_not_jdatetime(self):
+        """Test jalali raise error on wrong columns"""
+        df = self.df
+        with pytest.raises(TypeError):
+            df["date"].jalali.year  # pylint: disable=W0104
+
     def test_jalali_property(self):
         """Test jalali property like year, month, weeknumber"""
         df = self.df
@@ -37,3 +57,13 @@ class TestJalaliSerie:
         assert df["jdate"].jalali.weekday[0] == 3, "weekday is not 4"
         assert df["jdate"].jalali.weeknumber[0] == 42, "weeknumber is not 42"
         assert df["jdate"].jalali.quarter[0] == 4, "quarter is not 4"
+
+
+def test_jalali_strptime():
+    """Test jalali convertor from str to jalali"""
+    df = pd.DataFrame({"date": ["1399/08/02", "1399/08/03", "1399/08/04"]})
+    df["jdate"] = df["date"].jalali.parse_jalali("%Y/%m/%d")
+    date = df["jdate"].iloc[0]
+    assert date.year == 1399, "year is not 1399"
+    assert date.month == 8, "month is not 8"
+    assert date.day == 2, "day is not 2"
