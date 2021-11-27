@@ -2,6 +2,7 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dw/tehran_stocks.svg?color=blue)
 [![PyPI version](https://badge.fury.io/py/jalali-pandas.svg)](https://badge.fury.io/py/jalali-pandas)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+![Codecov branch](https://img.shields.io/codecov/c/github/ghodsizadeh/jalali-pandas/check_coverage?token=48e4c641-1d3e-4763-b771-d0fa55c144c3)
 
 # Jalali Pandas Extentsion
 
