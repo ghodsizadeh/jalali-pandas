@@ -1,9 +1,20 @@
+[![HitCount](http://hits.dwyl.com/ghodsizadeh/jalali-pandas.svg)](http://hits.dwyl.com/ghodsizadeh/jalali-pandas)
+![PyPI - Downloads](https://img.shields.io/pypi/dw/tehran_stocks.svg?color=blue)
+[![PyPI version](https://badge.fury.io/py/jalali-pandas.svg)](https://badge.fury.io/py/jalali-pandas)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+![Codecov branch](https://img.shields.io/codecov/c/github/ghodsizadeh/jalali-pandas/check_coverage?token=48e4c641-1d3e-4763-b771-d0fa55c144c3)
+
 # Jalali Pandas Extentsion
+
 This repository is a place to store pandas extension that handle jalali dates.
 
 ## ToDos:
+
 - [x] add Georgian to Jalali Conversion
 - [x] add Jalali to Georgian Conversion
 - [ ] add support for sampling
-- [ ] add date parser from other columns
+- [x] add date parser from other columns
 - [x] add date parser from string
+
+<!-- Pytest Coverage Comment:Begin -->
+<!-- Pytest Coverage Comment:End -->
