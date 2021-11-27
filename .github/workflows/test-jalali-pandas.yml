@@ -1,4 +1,5 @@
-name: Example workflow for Codecov
+name: code-coverage
+
 on: [push]
 jobs:
   run:
@@ -29,7 +30,6 @@ jobs:
         directory: ./coverage/reports/
         env_vars: OS,PYTHON
         fail_ci_if_error: true
-        flags: unittests
         name: codecov-umbrella
         path_to_write_report: ./coverage/codecov_report.txt
         verbose: true
