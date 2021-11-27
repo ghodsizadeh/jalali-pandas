@@ -1,3 +1,8 @@
+[![HitCount](http://hits.dwyl.com/ghodsizadeh/jalali-pandas.svg)](http://hits.dwyl.com/ghodsizadeh/jalali-pandas)
+![PyPI - Downloads](https://img.shields.io/pypi/dw/tehran_stocks.svg?color=blue)
+[![PyPI version](https://badge.fury.io/py/jalali-pandas.svg)](https://badge.fury.io/py/jalali-pandas)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+
 # Jalali Pandas Extentsion
 
 This repository is a place to store pandas extension that handle jalali dates.
