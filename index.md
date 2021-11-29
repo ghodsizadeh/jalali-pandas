@@ -102,7 +102,7 @@ mean = df.jalali.groupby(['year','quarter'])
 ```
 
 # Support
-Give a star
-Follow me on Youtube
-Tell others about this repoistory
 
+- Give a star
+- Follow me on [Youtube](https://www.youtube.com/channel/UCF3v_GwH3Jg2c-V3hRwmcbg)
+- Tell others about this repoistory
