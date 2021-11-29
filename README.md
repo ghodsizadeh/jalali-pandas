@@ -4,7 +4,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 [![codecov](https://codecov.io/gh/ghodsizadeh/jalali-pandas/branch/main/graph/badge.svg?token=LWQ85TN0NU)](https://codecov.io/gh/ghodsizadeh/jalali-pandas)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ghodsizadeh/jalali-pandas/examples/basic_usage.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ghodsizadeh/jalali-pandas/blob/main/examples/basic_usage.ipynb)
 ![GitHub Repo stars](https://img.shields.io/github/stars/ghodsizadeh/jalali-pandas?logoColor=blue&style=social)
 
 # Jalali Pandas Extentsion
