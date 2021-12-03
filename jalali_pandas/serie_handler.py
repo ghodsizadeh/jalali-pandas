@@ -39,7 +39,7 @@ class JalaliSerieAccessor:
         """
         return self._obj.apply(lambda x: jdatetime.datetime.fromgregorian(date=x))
 
-    def to_georgian(self) -> pd.Series:
+    def to_gregorian(self) -> pd.Series:
         """convert jalali datetime to python default datetime.
 
         Returns:
@@ -53,7 +53,7 @@ class JalaliSerieAccessor:
         """[summary]
 
         Args:
-            format (str, optional): like georgian datetime format. Defaults to "%Y-%m-%d".
+            format (str, optional): like gregorian datetime format. Defaults to "%Y-%m-%d".
 
         Returns:
             pd.Series: pd.Series of jalali datetime.

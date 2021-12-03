@@ -24,16 +24,16 @@ class TestJalaliSerie:
         return df
 
     def test_jalali_convertor(self):
-        """Test jalali convertor from georgian to jalali"""
+        """Test jalali convertor from gregorian to jalali"""
         df = self.df
         assert df["jdate"].iloc[0] == jdatetime.datetime(year=1397, month=10, day=11)
         assert df["date"].iloc[0] == pd.Timestamp("2019-01-01")
 
-    def test_georgian_convertor(self):
-        """Test jalali convertor from jalali to georgian"""
+    def test_gregorian_convertor(self):
+        """Test jalali convertor from jalali to gregorian"""
 
         df = self.df
-        df["gdate"] = df["jdate"].jalali.to_georgian()
+        df["gdate"] = df["jdate"].jalali.to_gregorian()
         date = df["gdate"].iloc[0]
         assert date.year == 2019, "year is not 2019"
         assert date.month == 1, "month is not 1"

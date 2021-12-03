@@ -18,8 +18,8 @@
 #### Series Extenstion
 
 - Convert _string_ to _Jalali_ date `1388/03/25` --> `jdatetime(1388,3,25,0,0)`
-- Convert _Georgian_ date to _Jalali_ date `datetime(2019,11,17,0,0)` --> `jdatetime(1398,8,26,0,0)`
-- Convert _Jalali_ date to _Georgian_ date `jdatetime(1398,10,18,0,0)` --> `datetim(2020,1,8,6,19)`
+- Convert _gregorian_ date to _Jalali_ date `datetime(2019,11,17,0,0)` --> `jdatetime(1398,8,26,0,0)`
+- Convert _Jalali_ date to _gregorian_ date `jdatetime(1398,10,18,0,0)` --> `datetim(2020,1,8,6,19)`
 
 #### DataFrame extenstion
 
@@ -51,7 +51,7 @@ df = pd.DataFrame({"date": pd.date_range("2019-01-01", periods=10, freq="D")})
 df["jdate"] = df["date"].jalali.to_jalali()
 
 # convert to gregorian
-df["gdate"] = df["jdate"].jalali.to_georgian()
+df["gdate"] = df["jdate"].jalali.to_gregorian()
 
 # parse string to jalali
 df1 = pd.DataFrame({"date": ["1399/08/02", "1399/08/03", "1399/08/04"]})
@@ -105,8 +105,8 @@ mean = df.jalali.groupby(['year','quarter'])
 
 ## ToDos:
 
-- [x] add Georgian to Jalali Conversion
-- [x] add Jalali to Georgian Conversion
+- [x] add gregorian to Jalali Conversion
+- [x] add Jalali to gregorian Conversion
 - [ ] add support for sampling
 - [x] add date parser from other columns
 - [x] add date parser from string
