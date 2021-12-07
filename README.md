@@ -11,7 +11,7 @@
 
 > A pandas extension that solves all problems of Jalai/Iraninan/Shamsi dates
 
-![Jalali Pandas python package](/assets/github-jalali-pandas.png)
+![Jalali Pandas python package](docs/assets/github-jalali-pandas.png)
 
 ## Features
 
