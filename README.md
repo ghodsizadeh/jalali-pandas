@@ -103,6 +103,19 @@ mean = df.jalali.groupby('yq')
 mean = df.jalali.groupby(['year','quarter'])
 ```
 
+---
+
+# راهنمای فارسی
+
+برای مطالعه راهنمای فارسی استفاده از کتابخانه به این آدرس مراجعه کنید.
+
+[معرفی بسته pandas-jalali | آموزش کار با تاریخ شمسی در pandas](https://learnwithmehdi.ir/posts/jalali-pandas/)
+[معرفی بسته pandas-jalali | آموزش کار با تاریخ شمسی در pandas](https://learnwithmehdi.ir/posts/jalali-pandas/)
+
+## راهنمای ویدیویی
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/PYS4Hxmzbyg/0.jpg)](https://www.youtube.com/watch?v=PYS4Hxmzbyg)
+
 ## ToDos:
 
 - [x] add gregorian to Jalali Conversion
