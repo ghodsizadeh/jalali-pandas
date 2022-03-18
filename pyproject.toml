@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jalali_pandas"
-version = "0.2.0"
+version = "0.2.2"
 description = "A Pandas extension to make work with Jalali Date easier."
 authors = ["Mehdi Ghodsizadeh <mehdi.ghodsizadeh@gmail.com>"]
 license = "GPL-3.0-only"
