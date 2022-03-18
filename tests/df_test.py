@@ -33,8 +33,8 @@ class TestJalaliDataFrame:
         mean = df.jalali.groupby("year").mean()
         assert (mean.index == [1397, 1398]).all(), "Year grouping is wrong"
         mean = df.jalali.groupby("month").mean()
-        assert (
-            set(mean.index).difference({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}) == set()
+        assert not set(mean.index).difference(
+            {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
         ), "computaion is wrong"
 
     def test_jalali_groupby_shorts(self):
