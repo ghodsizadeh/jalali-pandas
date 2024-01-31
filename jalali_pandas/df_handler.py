@@ -3,7 +3,7 @@ handle jalaali dates in pandas dataframes
 """
 from typing import List, Union
 import pandas as pd
-import jdatetime
+from persiantools.jdatetime import JalaliDateTime
 
 # pylint: disable=unused-import
 # from .serie_handler import JalaliSerieAccessor
@@ -38,7 +38,7 @@ class JalaliDataframeAccessor:
             pandas_obj (pd.DataFrame): [description]
         """
         for col in self.columns:
-            if isinstance(self._obj[col].iloc[0], jdatetime.date):
+            if isinstance(self._obj[col].iloc[0], JalaliDateTime):
                 print(f'Column "{col}" will be the refrence.')
                 self.jdate = col
                 return
@@ -52,11 +52,11 @@ class JalaliDataframeAccessor:
             pd.DataFrame: a dataframe with year, month, day, week, dayofweek, dayofmonth
         """
         df = self._obj.copy()
-        df["__year"] = df[self.jdate].jalali.year
-        df["__month"] = df[self.jdate].jalali.month
-        df["__day"] = df[self.jdate].jalali.day
-        df["__quarter"] = df[self.jdate].jalali.quarter
-        df["__weekday"] = df[self.jdate].jalali.weekday
+        df["__year"] = df[self.jdate].year
+        df["__month"] = df[self.jdate].month
+        df["__day"] = df[self.jdate].day
+        df["__quarter"] = df[self.jdate].quarter
+        df["__weekday"] = df[self.jdate].weekday
 
         return df
 

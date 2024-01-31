@@ -1,6 +1,6 @@
 """Test Series class
 """
-import jdatetime
+from persiantools.jdatetime import JalaliDateTime
 import pandas as pd
 import pytest
 from jalali_pandas import (  # pylint: disable=W0611
@@ -26,7 +26,7 @@ class TestJalaliSerie:
     def test_jalali_convertor(self):
         """Test jalali convertor from gregorian to jalali"""
         df = self.df
-        assert df["jdate"].iloc[0] == jdatetime.datetime(year=1397, month=10, day=11)
+        assert df["jdate"].iloc[0] == JalaliDateTime(year=1397, month=10, day=11)
         assert df["date"].iloc[0] == pd.Timestamp("2019-01-01")
 
     def test_gregorian_convertor(self):
@@ -55,7 +55,7 @@ class TestJalaliSerie:
         assert df["jdate"].jalali.minute[0] == 0, "minute is not 0"
         assert df["jdate"].jalali.second[0] == 0, "second is not 0"
         assert df["jdate"].jalali.weekday[0] == 3, "weekday is not 4"
-        assert df["jdate"].jalali.weeknumber[0] == 42, "weeknumber is not 42"
+        assert df["jdate"].jalali.week_of_year[0] == 42, "weeknumber is not 42"
         assert df["jdate"].jalali.quarter[0] == 4, "quarter is not 4"
 
 

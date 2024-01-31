@@ -3,6 +3,7 @@ handle jalaali dates in pandas series
 """
 import jdatetime
 import pandas as pd
+from persiantools.jdatetime import JalaliDateTime
 
 
 @pd.api.extensions.register_series_accessor("jalali")
@@ -28,7 +29,7 @@ class JalaliSerieAccessor:
             TypeError: [description]
         """
 
-        if not all(isinstance(x, (str, jdatetime.date)) for x in self._obj):
+        if not all(isinstance(x, (str, JalaliDateTime)) for x in self._obj):
             raise TypeError("pandas series must be jdatetime or string of jdate")
 
     def to_jalali(self) -> pd.Series:
@@ -37,7 +38,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series:  pd.Series of jalali datetime.
         """
-        return self._obj.apply(lambda x: jdatetime.datetime.fromgregorian(date=x))
+        return self._obj.apply(lambda x: JalaliDateTime.to_jalali(x))
 
     def to_gregorian(self) -> pd.Series:
         """convert jalali datetime to python default datetime.
@@ -46,7 +47,7 @@ class JalaliSerieAccessor:
             pd.Series: pd.Series of python datetime.
         """
 
-        return self._obj.apply(jdatetime.datetime.togregorian)
+        return self._obj.apply(JalaliDateTime.to_gregorian)
 
     #  pylint: disable=redefined-builtin
     def parse_jalali(self, format: str = "%Y-%m-%d") -> pd.Series:
@@ -58,7 +59,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: pd.Series of jalali datetime.
         """
-        return self._obj.apply(lambda x: jdatetime.datetime.strptime(x, format))
+        return self._obj.apply(lambda x: JalaliDateTime.strptime(x, format))
 
     @property
     def year(self) -> pd.Series:
@@ -132,14 +133,14 @@ class JalaliSerieAccessor:
         return self._obj.apply(lambda x: x.weekday())
 
     @property
-    def weeknumber(self) -> pd.Series:
+    def week_of_year(self) -> pd.Series:
         """get Jalali day of year
 
         Returns:
             pd.Series: Jalali day of year
         """
         self.__validate()
-        return self._obj.apply(lambda x: x.weeknumber())
+        return self._obj.apply(lambda x: x.week_of_year())
 
     @property
     def quarter(self):
