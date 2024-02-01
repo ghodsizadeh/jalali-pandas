@@ -1,7 +1,6 @@
 """
 handle jalaali dates in pandas series
 """
-import jdatetime
 import pandas as pd
 from persiantools.jdatetime import JalaliDateTime
 

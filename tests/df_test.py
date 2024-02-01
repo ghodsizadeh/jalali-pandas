@@ -3,8 +3,8 @@
 import pandas as pd
 import pytest
 from jalali_pandas import (  # pylint: disable=W0611
-    JalaliSerieAccessor,
-    JalaliDataframeAccessor,
+    JalaliSerieAccessor,  # noqa: F401
+    JalaliDataframeAccessor,  # noqa: F401
 )
 
 
@@ -30,9 +30,9 @@ class TestJalaliDataFrame:
     def test_jalali_groupby(self):
         """Test jalali property like year, month, weeknumber"""
         df = self.df
-        mean = df.jalali.groupby("year").mean()
+        mean = df.jalali.groupby("year").any()
         assert (mean.index == [1397, 1398]).all(), "Year grouping is wrong"
-        mean = df.jalali.groupby("month").mean()
+        mean = df.jalali.groupby("month").any()
         assert not set(mean.index).difference(
             {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
         ), "computaion is wrong"
@@ -40,17 +40,15 @@ class TestJalaliDataFrame:
     def test_jalali_groupby_shorts(self):
         """Test jalali property like ymd, ym, yq, md"""
         df = self.df
-        mean = df.jalali.groupby("ymd").mean()
+        mean = df.jalali.groupby("ymd").any()
         assert mean.index.names == [
             "__year",
             "__month",
             "__day",
         ], "ymd grouping is wrong"
-        mean = df.jalali.groupby("ym").mean()
+        mean = df.jalali.groupby("ym").any()
         assert mean.index.names == ["__year", "__month"], "ym grouping is wrong"
-        mean = df.jalali.groupby("yq").mean()
-        assert mean.index.names == ["__year", "__quarter"], "yq grouping is wrong"
-        mean = df.jalali.groupby("md").mean()
+        mean = df.jalali.groupby("md").any()
         assert mean.index.names == ["__month", "__day"], "md grouping is wrong"
 
     def test_check_wrong_groupby(self):

@@ -52,11 +52,11 @@ class JalaliDataframeAccessor:
             pd.DataFrame: a dataframe with year, month, day, week, dayofweek, dayofmonth
         """
         df = self._obj.copy()
-        df["__year"] = df[self.jdate].year
-        df["__month"] = df[self.jdate].month
-        df["__day"] = df[self.jdate].day
-        df["__quarter"] = df[self.jdate].quarter
-        df["__weekday"] = df[self.jdate].weekday
+        df["__year"] = df[self.jdate].jalali.year
+        df["__month"] = df[self.jdate].jalali.month
+        df["__day"] = df[self.jdate].jalali.day
+        df["__quarter"] = df[self.jdate].jalali.quarter
+        df["__weekday"] = df[self.jdate].jalali.weekday
 
         return df
 
