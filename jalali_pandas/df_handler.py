@@ -3,7 +3,7 @@ handle jalaali dates in pandas dataframes
 """
 from typing import List, Union
 import pandas as pd
-import jdatetime
+from persiantools.jdatetime import JalaliDateTime
 
 # pylint: disable=unused-import
 # from .serie_handler import JalaliSerieAccessor
@@ -38,7 +38,7 @@ class JalaliDataframeAccessor:
             pandas_obj (pd.DataFrame): [description]
         """
         for col in self.columns:
-            if isinstance(self._obj[col].iloc[0], jdatetime.date):
+            if isinstance(self._obj[col].iloc[0], JalaliDateTime):
                 print(f'Column "{col}" will be the refrence.')
                 self.jdate = col
                 return
