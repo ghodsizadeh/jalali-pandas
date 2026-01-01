@@ -1,20 +1,18 @@
-[tool.poetry]
+[project]
 name = "jalali_pandas"
 version = "0.2.2"
 description = "A Pandas extension to make work with Jalali Date easier."
-authors = ["Mehdi Ghodsizadeh <mehdi.ghodsizadeh@gmail.com>"]
-license = "GPL-3.0-only"
+authors = [{ name = "Mehdi Ghodsizadeh", email = "mehdi.ghodsizadeh@gmail.com" }]
+requires-python = ">=3.6,<4"
 readme = "README.md"
-homepage = "https://ghodsizadeh.github.io/jalali-pandas/"
-repository = "https://github.com/ghodsizadeh/jalali-pandas"
+license = "GPL-3.0-only"
+dependencies = ["jdatetime>=3.6.4,<4"]
 
-[tool.poetry.dependencies]
-python = "^3.6"
-jdatetime = "^3.6.4"
-
-[tool.poetry.urls]
+[project.urls]
+Homepage = "https://ghodsizadeh.github.io/jalali-pandas/"
+Repository = "https://github.com/ghodsizadeh/jalali-pandas"
 "Bug Tracker" = "https://github.com/ghodsizadeh/jalali-pandas/issues"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

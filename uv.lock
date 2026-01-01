@@ -1,0 +1,23 @@
+version = 1
+revision = 3
+requires-python = ">=3.6, <4"
+
+[[package]]
+name = "jalali-pandas"
+version = "0.2.2"
+source = { editable = "." }
+dependencies = [
+    { name = "jdatetime" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "jdatetime", specifier = ">=3.6.4,<4" }]
+
+[[package]]
+name = "jdatetime"
+version = "3.6.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/80/3c/f877dfedac17e5a1673203d2a63db00cb2a7418c632625fe957b7ae56a87/jdatetime-3.6.4.tar.gz", hash = "sha256:39d0be41076b3a3850c3bfa90817e7ed459edc0e9cadce37dc7229b11f121c7e", size = 13400, upload-time = "2021-09-23T09:59:14.263Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/90/3c/02afd3ae3e9fc912ea555ddf01d589d933342cccf4126f24c93121c716ad/jdatetime-3.6.4-py3-none-any.whl", hash = "sha256:ba32f2842ee6a6162b34d09e192d9bb75f239470f310f00f931c2b2199f7c141", size = 12344, upload-time = "2021-09-23T09:59:11.913Z" },
+]
