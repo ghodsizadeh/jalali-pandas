@@ -1,33 +1,31 @@
-"""
-handle jalaali dates in pandas series
-"""
+"""Handle Jalali dates in pandas series."""
+
+from __future__ import annotations
+
+from typing import Any
+
 import jdatetime
 import pandas as pd
 
 
 @pd.api.extensions.register_series_accessor("jalali")
 class JalaliSerieAccessor:
-    """
-    Accessor methods on pandas series to handle jalali dates
+    """Accessor methods on pandas series to handle Jalali dates."""
 
-    """
-
-    def __init__(self, pandas_obj: pd.Series):
-        """[summary]
+    def __init__(self, pandas_obj: pd.Series[Any]) -> None:
+        """Initialize the accessor.
 
         Args:
-            pandas_obj (pd.Series): [description]
+            pandas_obj: A pandas Series containing datetime data.
         """
-        # self._validate(pandas_obj)
         self._obj = pandas_obj
 
-    def __validate(self):
-        """validate pandas series is datetime or not.
+    def _validate(self) -> None:
+        """Validate pandas series contains jdatetime objects.
 
         Raises:
-            TypeError: [description]
+            TypeError: If series doesn't contain jdatetime or string dates.
         """
-
         if not all(isinstance(x, (str, jdatetime.date)) for x in self._obj):
             raise TypeError("pandas series must be jdatetime or string of jdate")
 
@@ -67,7 +65,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali year
         """
-        self.__validate()
+        self._validate()
         return self._obj.apply(lambda x: x.year)
 
     @property
@@ -78,7 +76,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali month
         """
-        self.__validate()
+        self._validate()
         return self._obj.apply(lambda x: x.month)
 
     @property
@@ -88,7 +86,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali day
         """
-        self.__validate()
+        self._validate()
         return self._obj.apply(lambda x: x.day)
 
     @property
@@ -98,7 +96,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali hour
         """
-        self.__validate()
+        self._validate()
         return self._obj.apply(lambda x: x.hour)
 
     @property
@@ -108,7 +106,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali minute
         """
-        self.__validate()
+        self._validate()
         return self._obj.apply(lambda x: x.minute)
 
     @property
@@ -118,7 +116,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali second
         """
-        self.__validate()
+        self._validate()
         return self._obj.apply(lambda x: x.second)
 
     @property
@@ -128,7 +126,7 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali weekday
         """
-        self.__validate()
+        self._validate()
         return self._obj.apply(lambda x: x.weekday())
 
     @property
@@ -138,16 +136,16 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: Jalali day of year
         """
-        self.__validate()
+        self._validate()
         return self._obj.apply(lambda x: x.weeknumber())
 
     @property
-    def quarter(self):
-        """get Jalali quarter
+    def quarter(self) -> pd.Series[Any]:
+        """Get Jalali quarter.
 
         Returns:
-            pd.Series: Jalali quarter
+            pd.Series: Jalali quarter (1-4).
         """
-        self.__validate()
+        self._validate()
         month = self.month
         return month.apply(lambda x: (x - 1) // 3 + 1)
