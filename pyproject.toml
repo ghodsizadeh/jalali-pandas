@@ -3,12 +3,27 @@ name = "jalali_pandas"
 version = "0.2.2"
 description = "A Pandas extension to make work with Jalali Date easier."
 authors = [{ name = "Mehdi Ghodsizadeh", email = "mehdi.ghodsizadeh@gmail.com" }]
-requires-python = ">=3.6,<4"
-readme = "README.md"
-license = "GPL-3.0-only"
-dependencies = ["jdatetime>=3.6.4,<4"]
+requires-python = ">=3.9,<4"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { file = "LICENSE" }
+keywords = ["jalali", "pandas", "jdatetime", "calendar", "date"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = ["jdatetime>=3.8.2"]
 
 [project.urls]
+Documentation = "https://ghodsizadeh.github.io/jalali-pandas/"
 Homepage = "https://ghodsizadeh.github.io/jalali-pandas/"
 Repository = "https://github.com/ghodsizadeh/jalali-pandas"
 "Bug Tracker" = "https://github.com/ghodsizadeh/jalali-pandas/issues"
