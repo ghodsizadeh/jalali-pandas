@@ -16,28 +16,28 @@ This document outlines the phased implementation plan for building full Jalali c
 ### Tasks
 
 #### 0.1 Project Infrastructure
-- [ ] Update `pyproject.toml` with new dependencies and configuration
-- [ ] Add `py.typed` marker
-- [ ] Configure mypy and pyright and (Astral ty)
-- [ ] Set up ruff for linting/formatting
-- [ ] Update pre-commit hooks
-- [ ] Set up GitHub Actions CI pipeline
+- [x] Update `pyproject.toml` with new dependencies and configuration
+- [x] Add `py.typed` marker
+- [x] Configure mypy and pyright and (Astral ty)
+- [x] Set up ruff for linting/formatting
+- [x] Update pre-commit hooks
+- [x] Set up GitHub Actions CI pipeline
 
 #### 0.2 Type System Foundation
-- [ ] Create `jalali_pandas/_typing.py` with type aliases
-- [ ] Define protocols for Jalali types
+- [x] Create `jalali_pandas/_typing.py` with type aliases
+- [x] Define protocols for Jalali types
 - [ ] Add type stubs for jdatetime if needed
 
 #### 0.3 Compatibility Layer
-- [ ] Create `jalali_pandas/compat/pandas_compat.py`
-- [ ] Detect pandas version and provide compatibility shims
+- [x] Create `jalali_pandas/compat/pandas_compat.py`
+- [x] Detect pandas version and provide compatibility shims
 - [ ] Create `jalali_pandas/compat/legacy.py` for v0.x API
 
 #### 0.4 Calendar Rules Module
-- [ ] Create `jalali_pandas/core/calendar.py`
-- [ ] Implement leap year detection (2820-year cycle)
-- [ ] Implement month length calculation
-- [ ] Define week start (Saturday) and quarter boundaries
+- [x] Create `jalali_pandas/core/calendar.py`
+- [x] Implement leap year detection (2820-year cycle)
+- [x] Implement month length calculation
+- [x] Define week start (Saturday) and quarter boundaries
 - [ ] Add comprehensive tests for calendar rules
 
 ### Deliverables
@@ -57,19 +57,19 @@ This document outlines the phased implementation plan for building full Jalali c
 ### Tasks
 
 #### 1.1 JalaliTimestamp Scalar
-- [ ] Create `jalali_pandas/core/timestamp.py`
-- [ ] Implement construction from components
-- [ ] Implement construction from string (parsing)
-- [ ] Implement `from_gregorian()` class method
-- [ ] Implement `to_gregorian()` method
-- [ ] Implement all properties (year, month, day, etc.)
-- [ ] Implement all boolean properties (is_leap_year, is_month_end, etc.)
-- [ ] Implement `strftime()` method
-- [ ] Implement `normalize()`, `floor()`, `ceil()`, `round()`
-- [ ] Implement `replace()` method
-- [ ] Implement arithmetic operators (+, -, with Timedelta)
-- [ ] Implement comparison operators
-- [ ] Implement `__hash__` for use as dict key
+- [x] Create `jalali_pandas/core/timestamp.py`
+- [x] Implement construction from components
+- [x] Implement construction from string (parsing)
+- [x] Implement `from_gregorian()` class method
+- [x] Implement `to_gregorian()` method
+- [x] Implement all properties (year, month, day, etc.)
+- [x] Implement all boolean properties (is_leap_year, is_month_end, etc.)
+- [x] Implement `strftime()` method
+- [x] Implement `normalize()`, `floor()`, `ceil()`, `round()`
+- [x] Implement `replace()` method
+- [x] Implement arithmetic operators (+, -, with Timedelta)
+- [x] Implement comparison operators
+- [x] Implement `__hash__` for use as dict key
 - [ ] Add NaT handling
 - [ ] Add timezone support (tz_localize, tz_convert)
 
@@ -82,22 +82,22 @@ This document outlines the phased implementation plan for building full Jalali c
 - [ ] Add comprehensive round-trip tests
 
 #### 1.3 JalaliDatetimeDtype
-- [ ] Create `jalali_pandas/core/dtypes.py`
-- [ ] Inherit from `pandas.api.extensions.ExtensionDtype`
-- [ ] Implement `name` property
-- [ ] Implement `type` property (returns JalaliTimestamp)
-- [ ] Implement `na_value` (returns pd.NaT)
-- [ ] Implement `construct_array_type()`
-- [ ] Implement `construct_from_string()`
-- [ ] Register dtype with pandas
+- [x] Create `jalali_pandas/core/dtypes.py`
+- [x] Inherit from `pandas.api.extensions.ExtensionDtype`
+- [x] Implement `name` property
+- [x] Implement `type` property (returns JalaliTimestamp)
+- [x] Implement `na_value` (returns pd.NaT)
+- [x] Implement `construct_array_type()`
+- [x] Implement `construct_from_string()`
+- [x] Register dtype with pandas
 
 #### 1.4 JalaliDatetimeArray
-- [ ] Create `jalali_pandas/core/arrays.py`
-- [ ] Inherit from `pandas.api.extensions.ExtensionArray`
-- [ ] Choose internal storage format (int64 nanoseconds)
-- [ ] Implement `_from_sequence()`
-- [ ] Implement `_from_sequence_of_strings()`
-- [ ] Implement `_from_factorized()`
+- [x] Create `jalali_pandas/core/arrays.py`
+- [x] Inherit from `pandas.api.extensions.ExtensionArray`
+- [x] Choose internal storage format (int64 nanoseconds)
+- [x] Implement `_from_sequence()`
+- [x] Implement `_from_sequence_of_strings()`
+- [x] Implement `_from_factorized()`
 - [ ] Implement `__len__`, `__getitem__`, `__setitem__`
 - [ ] Implement `__iter__`
 - [ ] Implement `isna()`
