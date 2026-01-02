@@ -19,7 +19,7 @@ from jalali_pandas.core.dtypes import JalaliDatetimeDtype
 # Core types
 from jalali_pandas.core.timestamp import JalaliTimestamp
 
-# Legacy accessors (backward compatibility)
+# Accessors
 from jalali_pandas.df_handler import JalaliDataframeAccessor
 
 # Frequency offsets
