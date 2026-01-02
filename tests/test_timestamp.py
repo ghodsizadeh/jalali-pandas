@@ -59,6 +59,21 @@ class TestJalaliTimestampCreation:
         ts = JalaliTimestamp(1403, 12, 30)  # 1403 is a leap year
         assert ts.day == 30
 
+    @pytest.mark.parametrize(
+        ("kwargs", "message"),
+        [
+            ({"hour": 24}, "Hour must be 0-23"),
+            ({"minute": 60}, "Minute must be 0-59"),
+            ({"second": 60}, "Second must be 0-59"),
+            ({"microsecond": 1_000_000}, "Microsecond must be"),
+            ({"nanosecond": 1000}, "Nanosecond must be"),
+        ],
+    )
+    def test_invalid_time_components(self, kwargs, message):
+        """Test invalid time components raise ValueError."""
+        with pytest.raises(ValueError, match=message):
+            JalaliTimestamp(1402, 1, 1, **kwargs)
+
 
 class TestJalaliTimestampProperties:
     """Tests for JalaliTimestamp derived properties."""
@@ -132,6 +147,34 @@ class TestJalaliTimestampConversion:
         restored = JalaliTimestamp.from_gregorian(gregorian)
         assert original == restored
 
+    def test_to_pydatetime(self):
+        """Test conversion to Python datetime."""
+        ts = JalaliTimestamp(1402, 1, 1, 10, 30, 0)
+        py_dt = ts.to_pydatetime()
+
+        assert py_dt.year == 2023
+        assert py_dt.hour == 10
+
+    def test_to_datetime64(self):
+        """Test conversion to numpy datetime64."""
+        ts = JalaliTimestamp(1402, 1, 1)
+        dt64 = ts.to_datetime64()
+
+        assert isinstance(dt64, np.datetime64)
+
+    def test_from_gregorian_with_timezone(self):
+        """Test from_gregorian applies timezone."""
+        ts = JalaliTimestamp.from_gregorian(pd.Timestamp("2023-03-21"), tz="UTC")
+        assert ts.tzinfo is not None
+
+    def test_now_and_today(self):
+        """Test now() and today() helpers."""
+        now = JalaliTimestamp.now()
+        today = JalaliTimestamp.today()
+
+        assert isinstance(now, JalaliTimestamp)
+        assert today.hour == 0
+
 
 class TestJalaliTimestampArithmetic:
     """Tests for JalaliTimestamp arithmetic operations."""
@@ -160,6 +203,12 @@ class TestJalaliTimestampArithmetic:
         assert isinstance(result, pd.Timedelta)
         assert result.days == 5
 
+    def test_radd_timedelta(self):
+        """Test right add for timedelta."""
+        ts = JalaliTimestamp(1402, 1, 1)
+        result = timedelta(days=1) + ts
+        assert result == JalaliTimestamp(1402, 1, 2)
+
 
 class TestJalaliTimestampComparison:
     """Tests for JalaliTimestamp comparison operations."""
@@ -186,6 +235,18 @@ class TestJalaliTimestampComparison:
         assert ts1 > ts2
         assert not ts2 > ts1
 
+    def test_less_than_or_equal(self):
+        """Test less than or equal comparison."""
+        ts1 = JalaliTimestamp(1402, 6, 15)
+        ts2 = JalaliTimestamp(1402, 6, 16)
+        assert ts1 <= ts2
+
+    def test_greater_than_or_equal(self):
+        """Test greater than or equal comparison."""
+        ts1 = JalaliTimestamp(1402, 6, 16)
+        ts2 = JalaliTimestamp(1402, 6, 15)
+        assert ts1 >= ts2
+
 
 class TestJalaliTimestampFormatting:
     """Tests for JalaliTimestamp formatting methods."""
@@ -210,6 +271,24 @@ class TestJalaliTimestampFormatting:
         """Test repr output."""
         ts = JalaliTimestamp(1402, 6, 15)
         assert "JalaliTimestamp" in repr(ts)
+
+    def test_strptime_two_digit_year(self):
+        """Test strptime handles two-digit years."""
+        ts = JalaliTimestamp.strptime("02-01-01", "%y-%m-%d")
+        assert ts.year == 1302
+
+    def test_isoformat_with_timezone(self):
+        """Test isoformat includes timezone offset."""
+        from datetime import timedelta, timezone
+
+        tz = timezone(timedelta(hours=3, minutes=30))
+        ts = JalaliTimestamp(1402, 6, 15, 10, 0, 0, tzinfo=tz)
+        assert ts.isoformat().endswith("+03:30")
+
+    def test_isoformat_with_microsecond(self):
+        """Test isoformat includes fractional seconds."""
+        ts = JalaliTimestamp(1402, 6, 15, 10, 0, 0, 123456)
+        assert ".123456" in ts.isoformat()
 
 
 class TestJalaliTimestampReplace:
@@ -240,6 +319,16 @@ class TestJalaliTimestampReplace:
         assert normalized.hour == 0
         assert normalized.minute == 0
         assert normalized.second == 0
+
+    def test_date_and_time_methods(self):
+        """Test date() and time() methods."""
+        ts = JalaliTimestamp(1402, 6, 15, 10, 30, 45, 123456)
+        date_only = ts.date()
+        time_only = ts.time()
+
+        assert date_only.hour == 0
+        assert time_only.hour == 10
+        assert time_only.minute == 30
 
 
 class TestJalaliNaT:
@@ -289,6 +378,8 @@ class TestJalaliNaT:
         assert not (JalaliNaT > ts)
         assert not (JalaliNaT < JalaliNaT)
         assert not (JalaliNaT > JalaliNaT)
+        assert not (JalaliNaT <= ts)
+        assert not (JalaliNaT >= ts)
 
     def test_nat_arithmetic_returns_nat(self):
         """Test that arithmetic with NaT returns NaT."""
@@ -307,8 +398,14 @@ class TestJalaliNaT:
         assert math.isnan(JalaliNaT.month)
         assert math.isnan(JalaliNaT.day)
         assert math.isnan(JalaliNaT.hour)
+        assert math.isnan(JalaliNaT.minute)
+        assert math.isnan(JalaliNaT.second)
+        assert math.isnan(JalaliNaT.microsecond)
+        assert math.isnan(JalaliNaT.nanosecond)
         assert math.isnan(JalaliNaT.quarter)
         assert math.isnan(JalaliNaT.dayofweek)
+        assert JalaliNaT.tzinfo is None
+        assert JalaliNaT.tz is None
 
     def test_nat_boolean_properties_return_false(self):
         """Test that NaT boolean properties return False."""
@@ -329,6 +426,10 @@ class TestJalaliNaT:
         result = JalaliNaT.to_datetime64()
         assert np.isnat(result)
 
+    def test_nat_to_pydatetime(self):
+        """Test NaT conversion to pydatetime returns None."""
+        assert JalaliNaT.to_pydatetime() is None
+
     def test_nat_strftime(self):
         """Test NaT strftime returns 'NaT'."""
         assert JalaliNaT.strftime("%Y-%m-%d") == "NaT"
@@ -340,6 +441,11 @@ class TestJalaliNaT:
     def test_nat_normalize(self):
         """Test NaT normalize returns NaT."""
         assert JalaliNaT.normalize() is JalaliNaT
+
+    def test_nat_date_time(self):
+        """Test NaT date/time accessors."""
+        assert JalaliNaT.date() is JalaliNaT
+        assert JalaliNaT.time() is None
 
     def test_nat_replace(self):
         """Test NaT replace returns NaT."""

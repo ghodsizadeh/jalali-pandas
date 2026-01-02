@@ -120,6 +120,17 @@ class TestJalaliDateRangeParameters:
 
         assert all(ts.hour == 0 and ts.minute == 0 for ts in idx)
 
+    def test_normalize_with_end(self):
+        """Test normalize applies to end date."""
+        idx = jalali_date_range(
+            "1402-01-01 10:00:00",
+            "1402-01-03 22:00:00",
+            freq="D",
+            normalize=True,
+        )
+
+        assert all(ts.hour == 0 for ts in idx)
+
     def test_inclusive_both(self):
         """Test inclusive='both' (default)."""
         idx = jalali_date_range("1402-01-01", "1402-01-05", freq="D", inclusive="both")
@@ -180,6 +191,21 @@ class TestJalaliDateRangeValidation:
         with pytest.raises(ValueError, match="Unknown frequency"):
             jalali_date_range("1402-01-01", periods=3, freq="INVALID")
 
+    def test_missing_freq_with_all_params(self):
+        """Test missing freq raises when start/end/periods are set."""
+        with pytest.raises(ValueError, match="freq must be specified"):
+            jalali_date_range("1402-01-01", "1402-01-05", periods=3)
+
+    def test_invalid_start_type(self):
+        """Test invalid start type raises TypeError."""
+        with pytest.raises(TypeError, match="Expected str or JalaliTimestamp"):
+            jalali_date_range(123, periods=3)  # type: ignore[arg-type]
+
+    def test_unparseable_start_string(self):
+        """Test invalid start string raises ValueError."""
+        with pytest.raises(ValueError, match="Cannot parse"):
+            jalali_date_range("invalid", periods=2)
+
 
 class TestJalaliDateRangeEdgeCases:
     """Edge case tests for jalali_date_range."""
@@ -217,3 +243,16 @@ class TestJalaliDateRangeEdgeCases:
         # 1402 is not a leap year, so Esfand has 29 days
         assert idx[1] == JalaliTimestamp(1402, 12, 29)
         assert idx[2] == JalaliTimestamp(1403, 1, 1)
+
+    def test_end_and_periods_with_jalali_offset(self):
+        """Test backward generation with Jalali offsets."""
+        idx = jalali_date_range(end="1402-03-31", periods=2, freq="JME")
+
+        assert len(idx) == 2
+        assert idx[-1].month == 3
+
+    def test_start_and_end_with_jalali_offset(self):
+        """Test start/end generation with Jalali offsets."""
+        idx = jalali_date_range("1402-01-01", "1402-03-31", freq="JME")
+
+        assert idx[0].is_month_end
