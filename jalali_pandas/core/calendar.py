@@ -269,24 +269,52 @@ def jdn_to_jalali(jdn: int) -> tuple[int, int, int]:
     Returns:
         Tuple of (year, month, day).
     """
-    # Algorithm based on the 2820-year cycle
-    a = jdn - 1948320
-    b = (a * 2816 + 1031337) // 1029983
-    c = a - (b - 1) * 365 - ((b * 682 - 110) // 2816)
-    d = b + 474 if b > 0 else b + 473
+    # Use the inverse of jalali_to_jdn algorithm
+    # Based on the 2820-year cycle
+    jdn_offset = jdn - 2121446  # Adjusted epoch
 
-    if c <= 0:
-        c += days_in_year(d - 1)
-        d -= 1
+    cycle_2820 = jdn_offset // 1029983
+    day_in_cycle = jdn_offset % 1029983
 
-    month = min(12, (c - 1) // 30 + 1)
-    day = c - (month - 1) * 30 - min(6, month - 1)
+    if day_in_cycle < 0:
+        cycle_2820 -= 1
+        day_in_cycle += 1029983
 
-    if day <= 0:
-        month -= 1
-        day += days_in_month(d, month)
+    # Find year within cycle
+    year_in_cycle = 0
+    remaining_days = day_in_cycle
 
-    return (d, month, day)
+    # 2820 years = 683 leap years + 2137 normal years
+    # Use approximation then adjust
+    year_in_cycle = (day_in_cycle * 2820) // 1029983
+    if year_in_cycle >= 2820:
+        year_in_cycle = 2819
+
+    # Calculate days up to this year
+    days_to_year = (year_in_cycle * 1029983 + 2816 - 1) // 2820
+    while days_to_year > day_in_cycle:
+        year_in_cycle -= 1
+        days_to_year = (year_in_cycle * 1029983 + 2816 - 1) // 2820
+
+    remaining_days = day_in_cycle - days_to_year
+
+    year = cycle_2820 * 2820 + year_in_cycle + 474
+
+    # Find month and day
+    if remaining_days < 186:  # First 6 months (31 days each)
+        month = remaining_days // 31 + 1
+        day = remaining_days % 31 + 1
+    else:
+        remaining_days -= 186
+        if remaining_days < 150:  # Months 7-11 (30 days each)
+            month = remaining_days // 30 + 7
+            day = remaining_days % 30 + 1
+        else:
+            remaining_days -= 150
+            month = 12
+            day = remaining_days + 1
+
+    return (year, month, day)
 
 
 def validate_jalali_date(year: int, month: int, day: int) -> bool:

@@ -6,6 +6,34 @@ This document outlines the phased implementation plan for building full Jalali c
 
 ---
 
+## Current Status (Updated: 2026-01-02)
+
+**Test Coverage: 92%** (Target: 90%+)
+
+### Phase 0: Foundation - ✅ COMPLETE
+- All infrastructure tasks completed
+- Calendar rules module with comprehensive tests
+- Compatibility layer in place
+
+### Phase 1: Core Types - ✅ MOSTLY COMPLETE
+- JalaliTimestamp fully functional
+- JalaliDatetimeDtype registered with pandas
+- JalaliDatetimeArray with all required methods
+- Remaining: NaT handling, timezone support, conversion module
+
+### Phase 3: Frequency Offsets - ✅ MOSTLY COMPLETE
+- Base offset class implemented
+- Month, Quarter, Year offsets working
+- Remaining: Week offset, frequency alias registration
+
+### Examples Created
+- `examples/01_basic_usage.py` - JalaliTimestamp basics
+- `examples/02_series_operations.py` - Series accessor usage
+- `examples/03_dataframe_operations.py` - DataFrame groupby
+- `examples/04_offsets.py` - Calendar offsets
+
+---
+
 ## Phase 0: Foundation (Week 1-2)
 
 ### Goals
@@ -38,7 +66,8 @@ This document outlines the phased implementation plan for building full Jalali c
 - [x] Implement leap year detection (2820-year cycle)
 - [x] Implement month length calculation
 - [x] Define week start (Saturday) and quarter boundaries
-- [ ] Add comprehensive tests for calendar rules
+- [x] Add comprehensive tests for calendar rules
+  - Completed: tests/test_calendar.py with 90%+ coverage
 
 ### Deliverables
 - Modern project setup with CI/CD
@@ -98,14 +127,15 @@ This document outlines the phased implementation plan for building full Jalali c
 - [x] Implement `_from_sequence()`
 - [x] Implement `_from_sequence_of_strings()`
 - [x] Implement `_from_factorized()`
-- [ ] Implement `__len__`, `__getitem__`, `__setitem__`
-- [ ] Implement `__iter__`
-- [ ] Implement `isna()`
-- [ ] Implement `copy()`
-- [ ] Implement `_concat_same_type()`
-- [ ] Implement vectorized properties (year, month, etc.)
-- [ ] Implement vectorized methods (strftime, normalize, etc.)
-- [ ] Implement `to_gregorian()` returning DatetimeArray
+- [x] Implement `__len__`, `__getitem__`, `__setitem__`
+- [x] Implement `__iter__`
+- [x] Implement `isna()`
+- [x] Implement `copy()`
+- [x] Implement `_concat_same_type()`
+- [x] Implement vectorized properties (year, month, etc.)
+- [x] Implement vectorized methods (strftime, normalize, etc.)
+- [x] Implement `to_gregorian()` returning DatetimeArray
+  - Completed: tests/test_arrays.py with comprehensive tests
 
 ### Deliverables
 - Working `JalaliTimestamp` with full functionality
@@ -172,35 +202,36 @@ This document outlines the phased implementation plan for building full Jalali c
 ### Tasks
 
 #### 3.1 Base Offset
-- [ ] Create `jalali_pandas/offsets/base.py`
-- [ ] Implement `JalaliOffset` base class
-- [ ] Define interface: `__add__`, `__radd__`, `rollforward`, `rollback`, `is_on_offset`
-- [ ] Implement `n` multiplier support
-- [ ] Implement `normalize` parameter
+- [x] Create `jalali_pandas/offsets/base.py`
+- [x] Implement `JalaliOffset` base class
+- [x] Define interface: `__add__`, `__radd__`, `rollforward`, `rollback`, `is_on_offset`
+- [x] Implement `n` multiplier support
+- [x] Implement `normalize` parameter
+  - Completed: tests/test_offsets.py with comprehensive tests
 
 #### 3.2 Month Offsets
-- [ ] Create `jalali_pandas/offsets/month.py`
-- [ ] Implement `JalaliMonthEnd`
+- [x] Create `jalali_pandas/offsets/month.py`
+- [x] Implement `JalaliMonthEnd`
   - Handle 31-day months (1-6)
   - Handle 30-day months (7-11)
   - Handle Esfand (29 or 30 days)
-- [ ] Implement `JalaliMonthBegin`
+- [x] Implement `JalaliMonthBegin`
 - [ ] Register frequency aliases ("JME", "JMS")
 
 #### 3.3 Quarter Offsets
-- [ ] Create `jalali_pandas/offsets/quarter.py`
-- [ ] Implement `JalaliQuarterEnd`
+- [x] Create `jalali_pandas/offsets/quarter.py`
+- [x] Implement `JalaliQuarterEnd`
   - Q1 ends 31 Khordad
   - Q2 ends 31 Shahrivar
   - Q3 ends 30 Azar
   - Q4 ends 29/30 Esfand
-- [ ] Implement `JalaliQuarterBegin`
+- [x] Implement `JalaliQuarterBegin`
 - [ ] Register frequency aliases ("JQE", "JQS")
 
 #### 3.4 Year Offsets
-- [ ] Create `jalali_pandas/offsets/year.py`
-- [ ] Implement `JalaliYearEnd` (29/30 Esfand)
-- [ ] Implement `JalaliYearBegin` (1 Farvardin)
+- [x] Create `jalali_pandas/offsets/year.py`
+- [x] Implement `JalaliYearEnd` (29/30 Esfand)
+- [x] Implement `JalaliYearBegin` (1 Farvardin)
 - [ ] Register frequency aliases ("JYE", "JYS")
 
 #### 3.5 Week Offset
@@ -210,7 +241,7 @@ This document outlines the phased implementation plan for building full Jalali c
 - [ ] Register frequency alias ("JW")
 
 #### 3.6 Offset Integration
-- [ ] Create `jalali_pandas/offsets/__init__.py`
+- [x] Create `jalali_pandas/offsets/__init__.py`
 - [ ] Register all offsets with pandas frequency system
 - [ ] Enable string frequency parsing ("JME", "2JME", etc.)
 

@@ -90,13 +90,13 @@ class JalaliDatetimeArray(ExtensionArray):
         """Set item(s) in the array."""
         if isinstance(value, JalaliTimestamp):
             self._data[key] = value
-        elif pd.isna(value):
-            self._data[key] = pd.NaT
         elif isinstance(value, JalaliDatetimeArray):
             self._data[key] = value._data
         elif isinstance(value, (list, np.ndarray)):
             values = self._from_sequence(cast(Sequence[Any], value), dtype=self._dtype)
             self._data[key] = values._data
+        elif pd.isna(value):
+            self._data[key] = pd.NaT
         else:
             raise TypeError(f"Cannot set {type(value)} in JalaliDatetimeArray")
 
