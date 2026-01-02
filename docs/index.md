@@ -105,6 +105,12 @@ mean = df.jalali.groupby(['year','quarter'])
 
 ---
 
+## Benchmarks
+
+Performance benchmarks: [Benchmarks](benchmarks.md)
+
+---
+
 # راهنمای فارسی
 
 برای مطالعه راهنمای فارسی استفاده از کتابخانه به این آدرس مراجعه کنید.

@@ -393,17 +393,21 @@ This document outlines the phased implementation plan for building full Jalali c
 - [x] Add lookup tables for common date ranges
 
 #### 6.3 Benchmarks
-- [ ] Set up ASV benchmark suite
-- [ ] Benchmark timestamp construction
-- [ ] Benchmark conversions
-- [ ] Benchmark array operations
-- [ ] Benchmark resampling
+- [x] Set up ASV benchmark suite
+- [x] Benchmark timestamp construction
+- [x] Benchmark conversions
+- [x] Benchmark array operations
+- [x] Benchmark resampling
 
 ### Deliverables
 - 90%+ test coverage
 - Performance benchmarks
 - Optimized hot paths
 
+### Completion Notes (6.3, 2026-01-02)
+- Added ASV configuration in `asv.conf.json` and benchmark suite under `benchmarks/`
+- Benchmarks cover timestamp construction, conversions, array operations, and resampling
+- Added benchmark documentation in `docs/benchmarks.md` with run instructions
 ### Completion Notes (6.2, 2026-01-02)
 - Added a conversion profiling script in `scripts/profile_conversion.py`
 - Added lookup-table caching for common Jalali/Gregorian ranges and wired it into vectorized conversion paths
