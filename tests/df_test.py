@@ -1,11 +1,9 @@
-"""Test Series class
-"""
+"""Test Series class"""
+
 import pandas as pd
 import pytest
-from jalali_pandas import (  # pylint: disable=W0611
-    JalaliSerieAccessor,
-    JalaliDataframeAccessor,
-)
+
+import jalali_pandas  # noqa: F401
 
 
 class TestJalaliDataFrame:
@@ -71,4 +69,4 @@ class TestJalaliDataFrame:
         df = self.df.copy()
         del df["jdate"]
         with pytest.raises(ValueError):
-            df.jalali  # pylint: disable=W0104
+            _ = df.jalali
