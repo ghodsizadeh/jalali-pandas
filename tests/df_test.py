@@ -58,11 +58,18 @@ class TestJalaliDataFrame:
         with pytest.raises(ValueError):
             df.jalali.groupby("wrong")
 
-    def test_not_implemeneted_resampling(self):
-        """Test implemented resampling"""
+    def test_resample_invalid_type(self):
+        """Test resample with invalid type raises ValueError."""
         df = self.df
-        with pytest.raises(NotImplementedError):
-            df.jalali.resample("D").mean()
+        with pytest.raises(ValueError):
+            df.jalali.resample("invalid_type")
+
+    def test_resample_monthly(self):
+        """Test resample by month works."""
+        df = self.df
+        result = df.jalali.resample("month")
+        assert result is not None
+        assert len(result) > 0
 
     def test_validation(self):
         """Test validation"""

@@ -98,6 +98,7 @@ class JalaliDatetimeIndex(Index):
         values: JalaliDatetimeArray,
         name: Hashable = None,
         freq: str | JalaliOffset | None = None,
+        refs: Any = None,  # noqa: ARG003 - pandas compatibility
     ) -> JalaliDatetimeIndex:
         """Create a new JalaliDatetimeIndex from values without validation."""
         result = object.__new__(cls)
