@@ -85,6 +85,16 @@ class TestToJalaliDatetimeScalar:
 
         assert pd.isna(result)
 
+    def test_invalid_string_ignore_raises(self):
+        """Test that invalid string with errors='ignore' raises TypeError."""
+        with pytest.raises(TypeError, match="errors='ignore'"):
+            to_jalali_datetime("invalid-date", errors="ignore")
+
+    def test_invalid_type_raises(self):
+        """Test invalid input type raises TypeError."""
+        with pytest.raises(TypeError):
+            to_jalali_datetime(123)  # type: ignore[arg-type]
+
 
 class TestToJalaliDatetimeSequence:
     """Tests for to_jalali_datetime with sequence inputs."""
@@ -125,6 +135,34 @@ class TestToJalaliDatetimeSequence:
         result = to_jalali_datetime(["1402-01-01", "invalid"], errors="coerce")
 
         assert len(result) == 2
+        assert pd.isna(result[1])
+
+    def test_sequence_with_timestamps(self):
+        """Test conversion from list of pandas Timestamps."""
+        items = [pd.Timestamp("2023-03-21"), pd.Timestamp("2023-03-22")]
+        result = to_jalali_datetime(items)
+
+        assert isinstance(result, JalaliDatetimeIndex)
+        assert result[0] == JalaliTimestamp(1402, 1, 1)
+
+    def test_sequence_with_jalali_timestamps(self):
+        """Test conversion from list of JalaliTimestamp objects."""
+        items = [JalaliTimestamp(1402, 1, 1), JalaliTimestamp(1402, 1, 2)]
+        result = to_jalali_datetime(items)
+
+        assert isinstance(result, JalaliDatetimeIndex)
+        assert result[1] == JalaliTimestamp(1402, 1, 2)
+
+    def test_invalid_in_sequence_ignore_raises(self):
+        """Test that invalid value with errors='ignore' raises ValueError."""
+        with pytest.raises(ValueError, match="errors='ignore'"):
+            to_jalali_datetime(["1402-01-01", "invalid"], errors="ignore")
+
+    def test_datetime_index_with_nat(self):
+        """Test DatetimeIndex conversion preserves NaT values."""
+        dti = pd.DatetimeIndex([pd.Timestamp("2023-03-21"), pd.NaT])
+        result = to_jalali_datetime(dti)
+
         assert pd.isna(result[1])
 
 
@@ -169,6 +207,22 @@ class TestToJalaliDatetimeSeries:
 
         assert len(result) == 3
         assert pd.isna(result.iloc[1])
+
+    def test_series_with_datetime_objects(self):
+        """Test Series with Python datetime values."""
+        from datetime import datetime
+
+        s = pd.Series([datetime(2023, 3, 21), datetime(2023, 3, 22)])
+        result = to_jalali_datetime(s)
+
+        assert result.iloc[0] == JalaliTimestamp(1402, 1, 1)
+
+    def test_series_errors_ignore_returns_original(self):
+        """Test errors='ignore' returns the original Series."""
+        s = pd.Series(["1402-01-01", "invalid-date"])
+        result = to_jalali_datetime(s, errors="ignore")
+
+        assert result is s
 
 
 class TestToGregorianDatetime:
@@ -221,10 +275,37 @@ class TestToGregorianDatetime:
         assert len(result) == 2
         assert pd.isna(result[1])
 
+    def test_from_jalali_dtype_series(self):
+        """Test conversion from Series with Jalali dtype."""
+        idx = JalaliDatetimeIndex(["1402-01-01", "1402-01-02"])
+        series = pd.Series(idx._data, name="jalali")
+        result = to_gregorian_datetime(series)
+
+        assert isinstance(result, pd.Series)
+        assert result.iloc[0] == pd.Timestamp("2023-03-21")
+
+    def test_series_invalid_element_raises(self):
+        """Test that invalid element types raise TypeError."""
+        s = pd.Series([JalaliTimestamp(1402, 1, 1), "not-jalali"])
+        with pytest.raises(TypeError, match="Cannot convert"):
+            _ = to_gregorian_datetime(s)
+
     def test_invalid_type_raises(self):
         """Test that invalid type raises TypeError."""
         with pytest.raises(TypeError):
-            to_gregorian_datetime("not a jalali type")  # type: ignore
+            to_gregorian_datetime("not a jalali type")  # type: ignore[arg-type]
+
+
+def test_datetime_index_ignore_raises(monkeypatch):
+    """Test errors='ignore' for DatetimeIndex raises ValueError."""
+    from jalali_pandas.api import conversion
+
+    def _raise(_: object) -> None:
+        raise ValueError("boom")
+
+    monkeypatch.setattr(conversion.JalaliTimestamp, "from_gregorian", _raise)
+    with pytest.raises(ValueError, match="errors='ignore'"):
+        to_jalali_datetime(pd.DatetimeIndex(["2023-03-21"]), errors="ignore")
 
 
 class TestRoundTrip:

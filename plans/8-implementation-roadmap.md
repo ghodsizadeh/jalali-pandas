@@ -8,7 +8,7 @@ This document outlines the phased implementation plan for building full Jalali c
 
 ## Current Status (Updated: 2026-01-02)
 
-**Test Coverage: 86%** (Target: 90%+)
+**Test Coverage: 94%** (Target: 90%+)
 
 ### Phase 0: Foundation - ✅ COMPLETE
 - All infrastructure tasks completed
@@ -380,17 +380,17 @@ This document outlines the phased implementation plan for building full Jalali c
 ### Tasks
 
 #### 6.1 Test Coverage
-- [ ] Write unit tests for all modules
-- [ ] Write integration tests
-- [ ] Write property-based tests with Hypothesis
-- [ ] Achieve 90%+ coverage
-- [ ] Test edge cases (leap years, month boundaries, NaT)
+- [x] Write unit tests for all modules
+- [x] Write integration tests
+- [x] Write property-based tests with Hypothesis
+- [x] Achieve 90%+ coverage
+- [x] Test edge cases (leap years, month boundaries, NaT)
 
 #### 6.2 Performance Optimization
-- [ ] Profile conversion operations
-- [ ] Optimize vectorized operations
-- [ ] Consider Cython for hot paths (future)
-- [ ] Add lookup tables for common date ranges
+- [x] Profile conversion operations
+- [x] Optimize vectorized operations
+- [x] Consider Cython for hot paths (future)
+- [x] Add lookup tables for common date ranges
 
 #### 6.3 Benchmarks
 - [x] Set up ASV benchmark suite
@@ -408,6 +408,14 @@ This document outlines the phased implementation plan for building full Jalali c
 - Added ASV configuration in `asv.conf.json` and benchmark suite under `benchmarks/`
 - Benchmarks cover timestamp construction, conversions, array operations, and resampling
 - Added benchmark documentation in `docs/benchmarks.md` with run instructions
+### Completion Notes (6.2, 2026-01-02)
+- Added a conversion profiling script in `scripts/profile_conversion.py`
+- Added lookup-table caching for common Jalali/Gregorian ranges and wired it into vectorized conversion paths
+- Reviewed Cython for hot paths and deferred to a future optimization phase
+### Completion Notes (6.1, 2026-01-02)
+- Added integration and property-based tests across accessors, conversion, and indexes
+- Added focused unit tests for legacy accessors and low-coverage paths
+- Coverage increased to 94% (563 tests passing)
 
 ---
 

@@ -377,6 +377,122 @@ class TestJalaliSeriesAccessor:
         assert result.iloc[0] == "1402-01-01"
         assert result.iloc[1] is None
 
+    def test_empty_series_property(self) -> None:
+        """Test empty series property access returns empty series."""
+        s = pd.Series([], dtype=object)
+        result = s.jalali.year
+        assert result.empty
+
+    def test_microsecond_and_nanosecond(self) -> None:
+        """Test microsecond and nanosecond properties."""
+        dates = [jdatetime.datetime(1402, 1, 1, 0, 0, 0, 123456), pd.NaT]
+        s = pd.Series(dates)
+        result_micro = s.jalali.microsecond
+        result_nano = s.jalali.nanosecond
+
+        assert result_micro.iloc[0] == 123456
+        assert result_nano.iloc[0] == 0
+        assert pd.isna(result_nano.iloc[1])
+
+    def test_week_dayofyear_daysinmonth_with_nat(self) -> None:
+        """Test week/dayofyear/daysinmonth handle NaT correctly."""
+        dates = [jdatetime.datetime(1402, 1, 1), pd.NaT]
+        s = pd.Series(dates)
+
+        assert s.jalali.week.iloc[0] >= 1
+        assert pd.isna(s.jalali.week.iloc[1])
+        assert s.jalali.dayofyear.iloc[0] == 1
+        assert pd.isna(s.jalali.dayofyear.iloc[1])
+        assert s.jalali.daysinmonth.iloc[0] == 31
+        assert pd.isna(s.jalali.daysinmonth.iloc[1])
+
+    def test_date_and_time_with_date_objects(self) -> None:
+        """Test date/time properties with jdatetime.date inputs."""
+        dates = [jdatetime.date(1402, 1, 1), pd.NaT]
+        s = pd.Series(dates)
+
+        result_date = s.jalali.date
+        result_time = s.jalali.time
+
+        assert isinstance(result_date.iloc[0], jdatetime.date)
+        assert result_time.iloc[0] == time(0, 0, 0)
+        assert result_time.iloc[1] is None
+
+    def test_month_day_name_with_nat(self, jalali_series: pd.Series) -> None:
+        """Test month/day name returns None for NaT values."""
+        s = pd.concat([jalali_series, pd.Series([pd.NaT])], ignore_index=True)
+        month_names = s.jalali.month_name(locale="en")
+        day_names = s.jalali.day_name(locale="en")
+
+        assert month_names.iloc[-1] is None
+        assert day_names.iloc[-1] is None
+
+    def test_floor_minute_second(self) -> None:
+        """Test floor for minute and second frequencies."""
+        dates = [jdatetime.datetime(1402, 1, 1, 10, 5, 45, 123456)]
+        s = pd.Series(dates)
+
+        floored_min = s.jalali.floor("min")
+        floored_sec = s.jalali.floor("s")
+
+        assert floored_min.iloc[0].minute == 5
+        assert floored_min.iloc[0].second == 0
+        assert floored_sec.iloc[0].second == 45
+        assert floored_sec.iloc[0].microsecond == 0
+
+    def test_floor_date_passthrough(self) -> None:
+        """Test floor returns non-datetime values unchanged."""
+        dates = [jdatetime.date(1402, 1, 1)]
+        s = pd.Series(dates)
+
+        result = s.jalali.floor("D")
+        assert isinstance(result.iloc[0], jdatetime.date)
+
+    def test_ceil_minute_second(self) -> None:
+        """Test ceil for minute and second frequencies."""
+        dates = [jdatetime.datetime(1402, 1, 1, 10, 5, 30, 1)]
+        s = pd.Series(dates)
+
+        ceiled_min = s.jalali.ceil("min")
+        ceiled_sec = s.jalali.ceil("s")
+
+        assert ceiled_min.iloc[0].minute == 6
+        assert ceiled_min.iloc[0].second == 0
+        assert ceiled_sec.iloc[0].second == 31
+
+    def test_round_minute_second(self) -> None:
+        """Test round for minute and second frequencies."""
+        dates = [jdatetime.datetime(1402, 1, 1, 10, 5, 40, 600000)]
+        s = pd.Series(dates)
+
+        rounded_min = s.jalali.round("min")
+        rounded_sec = s.jalali.round("s")
+
+        assert rounded_min.iloc[0].minute == 6
+        assert rounded_sec.iloc[0].second == 41
+
+    def test_ceil_and_round_invalid_freq(self, jalali_series: pd.Series) -> None:
+        """Test ceil and round with invalid frequency raises error."""
+        with pytest.raises(ValueError):
+            jalali_series.jalali.ceil("invalid")
+        with pytest.raises(ValueError):
+            jalali_series.jalali.round("invalid")
+
+    def test_timezone_localize_and_convert(self) -> None:
+        """Test tz_localize and tz_convert methods."""
+        from datetime import timedelta, timezone
+
+        naive_dates = [jdatetime.datetime(1402, 1, 1, 12, 0, 0)]
+        s = pd.Series(naive_dates)
+        localized = s.jalali.tz_localize("UTC")
+        assert localized.iloc[0].tzinfo is not None
+
+        offset_tz = timezone(timedelta(hours=3, minutes=30))
+        aware_dates = [jdatetime.datetime(1402, 1, 1, 12, 0, 0, tzinfo=timezone.utc)]
+        aware_series = pd.Series(aware_dates)
+        converted = aware_series.jalali.tz_convert(offset_tz)
+        assert converted.iloc[0].tzinfo is not None
+
 
 class TestJalaliDataFrameAccessor:
     """Test cases for JalaliDataFrameAccessor."""
@@ -415,6 +531,21 @@ class TestJalaliDataFrameAccessor:
         with pytest.raises(ValueError, match="not found"):
             jalali_df.jalali.set_date_column("nonexistent")
 
+    def test_set_date_column_wrong_type(self) -> None:
+        """Test set_date_column with non-jdatetime column raises error."""
+        df = pd.DataFrame(
+            {
+                "jdate": [
+                    jdatetime.datetime(1402, 1, 1),
+                    jdatetime.datetime(1402, 1, 2),
+                ],
+                "date": pd.date_range("2023-01-01", periods=2),
+                "value": [1, 2],
+            }
+        )
+        with pytest.raises(ValueError, match="does not contain jdatetime"):
+            df.jalali.set_date_column("date")
+
     # -------------------------------------------------------------------------
     # Groupby Tests
     # -------------------------------------------------------------------------
@@ -450,6 +581,11 @@ class TestJalaliDataFrameAccessor:
         """Test groupby with invalid key raises error."""
         with pytest.raises(ValueError):
             jalali_df.jalali.groupby("invalid")
+
+    def test_groupby_dayofmonth(self, jalali_df: pd.DataFrame) -> None:
+        """Test groupby by dayofmonth alias."""
+        result = jalali_df.jalali.groupby("dayofmonth").sum()
+        assert "__day" in result.index.names
 
     # -------------------------------------------------------------------------
     # Resample Tests
@@ -511,6 +647,21 @@ class TestJalaliDataFrameAccessor:
         with pytest.raises(ValueError, match="not found"):
             jalali_df.jalali.convert_columns("nonexistent")
 
+    def test_convert_columns_parse_strings(self) -> None:
+        """Test convert_columns parses Jalali strings before Gregorian conversion."""
+        df = pd.DataFrame(
+            {
+                "jdate": [
+                    jdatetime.datetime(1402, 1, 1),
+                    jdatetime.datetime(1402, 1, 2),
+                ],
+                "jdate_str": ["1402-01-01", "1402-01-02"],
+                "value": [1, 2],
+            }
+        )
+        result = df.jalali.convert_columns("jdate_str", to_jalali=False)
+        assert isinstance(result["jdate_str"].iloc[0], pd.Timestamp)
+
     # -------------------------------------------------------------------------
     # To Period Tests
     # -------------------------------------------------------------------------
@@ -541,6 +692,19 @@ class TestJalaliDataFrameAccessor:
         """Test to_period with day frequency."""
         result = jalali_df.jalali.to_period("D")
         assert result["jdate_period"].iloc[0] == "1402-01-01"
+
+    def test_to_period_with_nat(self) -> None:
+        """Test to_period handles NaT values."""
+        df = pd.DataFrame(
+            {"jdate": [jdatetime.datetime(1402, 1, 1), pd.NaT], "value": [1, 2]}
+        )
+        result = df.jalali.to_period("M")
+        assert result["jdate_period"].iloc[1] is None
+
+    def test_to_period_invalid_freq(self, jalali_df: pd.DataFrame) -> None:
+        """Test to_period with invalid frequency raises error."""
+        with pytest.raises(ValueError, match="Unsupported frequency"):
+            jalali_df.jalali.to_period("INVALID")
 
     # -------------------------------------------------------------------------
     # Filter Tests
