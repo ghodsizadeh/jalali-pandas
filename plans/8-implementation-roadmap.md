@@ -8,7 +8,7 @@ This document outlines the phased implementation plan for building full Jalali c
 
 ## Current Status (Updated: 2026-01-02)
 
-**Test Coverage: 86%** (Target: 90%+)
+**Test Coverage: 94%** (Target: 90%+)
 
 ### Phase 0: Foundation - ✅ COMPLETE
 - All infrastructure tasks completed
@@ -380,11 +380,11 @@ This document outlines the phased implementation plan for building full Jalali c
 ### Tasks
 
 #### 6.1 Test Coverage
-- [ ] Write unit tests for all modules
-- [ ] Write integration tests
-- [ ] Write property-based tests with Hypothesis
-- [ ] Achieve 90%+ coverage
-- [ ] Test edge cases (leap years, month boundaries, NaT)
+- [x] Write unit tests for all modules
+- [x] Write integration tests
+- [x] Write property-based tests with Hypothesis
+- [x] Achieve 90%+ coverage
+- [x] Test edge cases (leap years, month boundaries, NaT)
 
 #### 6.2 Performance Optimization
 - [ ] Profile conversion operations
@@ -403,6 +403,11 @@ This document outlines the phased implementation plan for building full Jalali c
 - 90%+ test coverage
 - Performance benchmarks
 - Optimized hot paths
+
+### Completion Notes (6.1, 2026-01-02)
+- Added integration and property-based tests across accessors, conversion, and indexes
+- Added focused unit tests for legacy accessors and low-coverage paths
+- Coverage increased to 94% (563 tests passing)
 
 ---
 
