@@ -8,7 +8,6 @@ import jdatetime
 import pandas as pd
 
 
-@pd.api.extensions.register_series_accessor("jalali")
 class JalaliSerieAccessor:
     """Accessor methods on pandas series to handle Jalali dates."""
 

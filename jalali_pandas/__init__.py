@@ -6,10 +6,8 @@ for pandas, including custom dtypes, timestamps, and time series operations.
 """
 
 from jalali_pandas._version import __version__
-
-# Accessors (new enhanced versions - imported LAST to override legacy)
-from jalali_pandas.accessors.dataframe import JalaliDataFrameAccessor  # noqa: E402
-from jalali_pandas.accessors.series import JalaliSeriesAccessor  # noqa: E402
+from jalali_pandas.accessors.dataframe import JalaliDataFrameAccessor
+from jalali_pandas.accessors.series import JalaliSeriesAccessor
 from jalali_pandas.api import (
     jalali_date_range,
     to_gregorian_datetime,
@@ -24,8 +22,6 @@ from jalali_pandas.core.calendar import (
 from jalali_pandas.core.dtypes import JalaliDatetimeDtype
 from jalali_pandas.core.indexes import JalaliDatetimeIndex
 from jalali_pandas.core.timestamp import JalaliTimestamp
-
-# Legacy accessors (imported first, will be overridden by new ones)
 from jalali_pandas.df_handler import JalaliDataframeAccessor
 from jalali_pandas.offsets import (
     JalaliMonthBegin,
