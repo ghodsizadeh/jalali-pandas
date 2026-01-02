@@ -22,7 +22,6 @@ jalali-pandas/
 │   │   ├── getting-started/
 │   │   │   ├── installation.md
 │   │   │   ├── quickstart.md
-│   │   │   └── migration.md    # Migration from v0.x
 │   │   ├── user-guide/
 │   │   │   ├── timestamps.md
 │   │   │   ├── date-ranges.md
@@ -49,7 +48,6 @@ jalali-pandas/
 │   ├── basic_usage.ipynb       # Existing notebook (updated)
 │   ├── financial_analysis.ipynb
 │   ├── time_series_resampling.ipynb
-│   └── migration_guide.ipynb
 │
 ├── jalali_pandas/
 │   ├── __init__.py             # Public API exports
@@ -89,11 +87,6 @@ jalali-pandas/
 │   │   ├── period_range.py     # jalali_period_range
 │   │   ├── conversion.py       # to_jalali_datetime, to_gregorian_datetime
 │   │   └── grouper.py          # JalaliGrouper
-│   │
-│   ├── compat/                 # Compatibility layer
-│   │   ├── __init__.py
-│   │   ├── pandas_compat.py    # Pandas version compatibility
-│   │   └── legacy.py           # Legacy API support (v0.x)
 │   │
 │   └── testing/                # Testing utilities
 │       ├── __init__.py
@@ -218,17 +211,6 @@ Public API functions.
 | `period_range.py` | `jalali_period_range()` |
 | `conversion.py` | `to_jalali_datetime()`, `to_gregorian_datetime()` |
 | `grouper.py` | `JalaliGrouper` class |
-
-### `jalali_pandas/compat/`
-
-Compatibility and legacy support.
-
-| Module | Purpose |
-|--------|---------|
-| `pandas_compat.py` | Handle pandas version differences (2.0+, 2.1+, 2.2+) |
-| `legacy.py` | Maintain backward compatibility with v0.x API |
-
----
 
 ## Public API (`__init__.py`)
 
@@ -504,7 +486,7 @@ class JalaliDatetimeArray(ExtensionArray):
 Follow [Semantic Versioning](https://semver.org/):
 
 - **1.0.0**: First stable release with full API
-- **1.x.y**: Backward-compatible additions and fixes
+- **1.x.y**: Additions and fixes
 - **2.0.0**: Breaking changes (if needed)
 
 ### Version Compatibility
