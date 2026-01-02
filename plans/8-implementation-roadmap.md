@@ -8,7 +8,7 @@ This document outlines the phased implementation plan for building full Jalali c
 
 ## Current Status (Updated: 2026-01-02)
 
-**Test Coverage: 92%** (Target: 90%+)
+**Test Coverage: 86%** (Target: 90%+)
 
 ### Phase 0: Foundation - ✅ COMPLETE
 - All infrastructure tasks completed
@@ -22,6 +22,14 @@ This document outlines the phased implementation plan for building full Jalali c
 - Timezone support (tz_localize, tz_convert)
 - Conversion module with vectorized operations
 
+### Phase 2: Index & Range Generation - ✅ COMPLETE
+- JalaliDatetimeIndex with full functionality
+- jalali_date_range() for generating date ranges
+- to_jalali_datetime() and to_gregorian_datetime() conversion functions
+- String and partial string indexing support
+- Set operations (union, intersection, difference)
+- Shift and snap operations
+
 ### Phase 3: Frequency Offsets - ✅ COMPLETE
 - Base offset class implemented
 - Month, Quarter, Year offsets working
@@ -34,6 +42,7 @@ This document outlines the phased implementation plan for building full Jalali c
 - `examples/02_series_operations.py` - Series accessor usage
 - `examples/03_dataframe_operations.py` - DataFrame groupby
 - `examples/04_offsets.py` - Calendar offsets (updated with week offset and aliases)
+- `examples/05_index_and_date_range.py` - JalaliDatetimeIndex and date range generation
 
 ---
 
@@ -151,37 +160,37 @@ This document outlines the phased implementation plan for building full Jalali c
 ### Tasks
 
 #### 2.1 JalaliDatetimeIndex
-- [ ] Create `jalali_pandas/core/indexes.py`
-- [ ] Inherit from `pandas.Index`
-- [ ] Wrap `JalaliDatetimeArray` as `_data`
-- [ ] Implement construction from various inputs
-- [ ] Implement `freq` property
-- [ ] Implement frequency inference
-- [ ] Implement string indexing ("1402-06-15")
-- [ ] Implement partial string indexing ("1402-06", "1402")
-- [ ] Implement slice indexing
-- [ ] Implement `shift()` method
-- [ ] Implement `snap()` method
-- [ ] Implement set operations (union, intersection, difference)
-- [ ] Implement `to_gregorian()` returning DatetimeIndex
+- [x] Create `jalali_pandas/core/indexes.py`
+- [x] Inherit from `pandas.Index`
+- [x] Wrap `JalaliDatetimeArray` as `_data`
+- [x] Implement construction from various inputs
+- [x] Implement `freq` property
+- [x] Implement frequency inference
+- [x] Implement string indexing ("1402-06-15")
+- [x] Implement partial string indexing ("1402-06", "1402")
+- [x] Implement slice indexing
+- [x] Implement `shift()` method
+- [x] Implement `snap()` method
+- [x] Implement set operations (union, intersection, difference)
+- [x] Implement `to_gregorian()` returning DatetimeIndex
 
 #### 2.2 Date Range Generation
-- [ ] Create `jalali_pandas/api/date_range.py`
-- [ ] Implement `jalali_date_range()` function
-- [ ] Support start/end/periods combinations
-- [ ] Support all frequency strings (D, h, min, s, JME, JQE, JYE, etc.)
-- [ ] Support timezone parameter
-- [ ] Support normalize parameter
-- [ ] Support inclusive parameter
-- [ ] Validate parameter combinations
+- [x] Create `jalali_pandas/api/date_range.py`
+- [x] Implement `jalali_date_range()` function
+- [x] Support start/end/periods combinations
+- [x] Support all frequency strings (D, h, min, s, JME, JQE, JYE, etc.)
+- [x] Support timezone parameter
+- [x] Support normalize parameter
+- [x] Support inclusive parameter
+- [x] Validate parameter combinations
 
 #### 2.3 Conversion Functions
-- [ ] Create `jalali_pandas/api/conversion.py`
-- [ ] Implement `to_jalali_datetime()` function
-- [ ] Support string, list, Series, DatetimeIndex inputs
-- [ ] Support format parameter
-- [ ] Support errors parameter (raise, coerce, ignore)
-- [ ] Implement `to_gregorian_datetime()` function
+- [x] Create `jalali_pandas/api/conversion.py`
+- [x] Implement `to_jalali_datetime()` function
+- [x] Support string, list, Series, DatetimeIndex inputs
+- [x] Support format parameter
+- [x] Support errors parameter (raise, coerce, ignore)
+- [x] Implement `to_gregorian_datetime()` function
 
 ### Deliverables
 - Working `JalaliDatetimeIndex` for time series
