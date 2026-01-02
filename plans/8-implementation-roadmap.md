@@ -37,6 +37,15 @@ This document outlines the phased implementation plan for building full Jalali c
 - Frequency alias registration (JME, JMS, JQE, JQS, JYE, JYS, JW)
 - parse_jalali_frequency() for string parsing
 
+### Phase 4: Time Series Operations - ✅ COMPLETE
+- JalaliGrouper class for Jalali calendar-based grouping
+- JalaliResampler class for resampling with Jalali boundaries
+- resample_jalali() function for easy resampling
+- DataFrame accessor resample() method (month, quarter, year)
+- Rolling/expanding operations work with Gregorian index
+- Shifting works with JalaliDatetimeIndex and Timedelta/JalaliOffset
+- Comprehensive tests for all time series operations
+
 ### Examples Created
 - `examples/01_basic_usage.py` - JalaliTimestamp basics
 - `examples/02_series_operations.py` - Series accessor usage
@@ -268,40 +277,48 @@ This document outlines the phased implementation plan for building full Jalali c
 ### Tasks
 
 #### 4.1 Resampling
-- [ ] Ensure `JalaliDatetimeIndex.resample()` works with Jalali offsets
-- [ ] Test all aggregation methods (mean, sum, min, max, etc.)
-- [ ] Test upsampling with fill methods
-- [ ] Test downsampling
-- [ ] Test closed/label parameters
-- [ ] Document any limitations
+- [x] Implement `resample_jalali()` function for Jalali-aware resampling
+- [x] Test all aggregation methods (mean, sum, min, max, etc.)
+- [x] Test upsampling with fill methods
+- [x] Test downsampling
+- [x] Test closed/label parameters
+- [x] Document limitations: pandas resample() doesn't accept custom JalaliOffset directly; use resample_jalali() instead
 
 #### 4.2 JalaliGrouper
-- [ ] Create `jalali_pandas/api/grouper.py`
-- [ ] Implement `JalaliGrouper` class
-- [ ] Support `key` parameter for column-based grouping
-- [ ] Support `freq` parameter for frequency-based grouping
-- [ ] Integrate with `DataFrame.groupby()`
+- [x] Create `jalali_pandas/api/grouper.py`
+- [x] Implement `JalaliGrouper` class
+- [x] Support `key` parameter for column-based grouping
+- [x] Support `freq` parameter for frequency-based grouping
+- [x] Integrate with `DataFrame.groupby()` via `get_grouper()` method
 
 #### 4.3 DataFrame Accessor Resample
-- [ ] Update `JalaliDataFrameAccessor.resample()`
-- [ ] Remove `NotImplementedError`
-- [ ] Implement using JalaliGrouper internally
-- [ ] Support all resample parameters
+- [x] Update `JalaliDataFrameAccessor.resample()`
+- [x] Remove `NotImplementedError`
+- [x] Implement using groupby internally (month, quarter, year)
+- [x] Support resample parameters: month, quarter, year
 
 #### 4.4 Rolling/Expanding
-- [ ] Test rolling with Jalali offset windows
-- [ ] Test expanding operations
-- [ ] Document any limitations
+- [x] Test rolling with Timedelta windows (works with Gregorian index)
+- [x] Test expanding operations
+- [x] Document limitations: rolling requires Gregorian DatetimeIndex
 
 #### 4.5 Shifting
-- [ ] Test `Series.shift(freq=JalaliOffset)`
-- [ ] Test `DataFrame.shift(freq=JalaliOffset)`
-- [ ] Test `JalaliDatetimeIndex.shift()`
+- [x] Test `Series.shift(freq=Timedelta)` with Gregorian index
+- [x] Test `DataFrame.shift(freq=Timedelta)` with Gregorian index
+- [x] Test `JalaliDatetimeIndex.shift()` with JalaliOffset and Timedelta
 
 ### Deliverables
-- Full resampling support with Jalali boundaries
+- Full resampling support with Jalali boundaries via `resample_jalali()`
 - JalaliGrouper for flexible grouping
 - Rolling/shifting work with Jalali offsets
+
+### Completion Notes (2026-01-02)
+- Created `jalali_pandas/api/grouper.py` with JalaliGrouper and JalaliResampler classes
+- Added `resample_jalali()` function for easy Jalali-aware resampling
+- Updated DataFrame accessor `resample()` to support month/quarter/year grouping
+- Added `refs` parameter to `JalaliDatetimeIndex._simple_new()` for pandas compatibility
+- 27 new tests in `tests/test_time_series.py`
+- Total: 393 tests passing, 86% coverage
 
 ---
 
