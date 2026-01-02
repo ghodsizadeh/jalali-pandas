@@ -7,32 +7,26 @@ for pandas, including custom dtypes, timestamps, and time series operations.
 
 from jalali_pandas._version import __version__
 
-# API functions
+# Accessors (new enhanced versions - imported LAST to override legacy)
+from jalali_pandas.accessors.dataframe import JalaliDataFrameAccessor  # noqa: E402
+from jalali_pandas.accessors.series import JalaliSeriesAccessor  # noqa: E402
 from jalali_pandas.api import (
     jalali_date_range,
     to_gregorian_datetime,
     to_jalali_datetime,
 )
 from jalali_pandas.core.arrays import JalaliDatetimeArray
-
-# Calendar utilities
 from jalali_pandas.core.calendar import (
     days_in_month,
     days_in_year,
     is_leap_year,
 )
 from jalali_pandas.core.dtypes import JalaliDatetimeDtype
-
-# Index
 from jalali_pandas.core.indexes import JalaliDatetimeIndex
-
-# Core types
 from jalali_pandas.core.timestamp import JalaliTimestamp
 
-# Accessors
+# Legacy accessors (imported first, will be overridden by new ones)
 from jalali_pandas.df_handler import JalaliDataframeAccessor
-
-# Frequency offsets
 from jalali_pandas.offsets import (
     JalaliMonthBegin,
     JalaliMonthEnd,
@@ -68,7 +62,10 @@ __all__ = [
     "JalaliQuarterEnd",
     "JalaliYearBegin",
     "JalaliYearEnd",
-    # Accessors
+    # Accessors (new enhanced versions)
+    "JalaliDataFrameAccessor",
+    "JalaliSeriesAccessor",
+    # Legacy accessors (for backward compatibility)
     "JalaliDataframeAccessor",
     "JalaliSerieAccessor",
 ]
