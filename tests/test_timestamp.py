@@ -1,11 +1,16 @@
 """Tests for JalaliTimestamp."""
 
+from __future__ import annotations
+
+import math
 from datetime import timedelta
 
+import numpy as np
 import pandas as pd
 import pytest
 
 from jalali_pandas import JalaliTimestamp
+from jalali_pandas.core.timestamp import JalaliNaT, isna_jalali
 
 
 class TestJalaliTimestampCreation:
@@ -235,3 +240,205 @@ class TestJalaliTimestampReplace:
         assert normalized.hour == 0
         assert normalized.minute == 0
         assert normalized.second == 0
+
+
+class TestJalaliNaT:
+    """Tests for JalaliNaT (Not-a-Time) handling."""
+
+    def test_nat_singleton(self):
+        """Test that JalaliNaT is a singleton."""
+        from jalali_pandas.core.timestamp import _JalaliNaTType
+
+        nat1 = _JalaliNaTType()
+        nat2 = _JalaliNaTType()
+        assert nat1 is nat2
+        assert nat1 is JalaliNaT
+
+    def test_nat_repr(self):
+        """Test JalaliNaT string representation."""
+        assert repr(JalaliNaT) == "JalaliNaT"
+        assert str(JalaliNaT) == "JalaliNaT"
+
+    def test_nat_bool(self):
+        """Test JalaliNaT is falsy."""
+        assert not JalaliNaT
+        assert bool(JalaliNaT) is False
+
+    def test_nat_hash(self):
+        """Test JalaliNaT is hashable."""
+        assert hash(JalaliNaT) == hash("JalaliNaT")
+        # Can be used in sets/dicts
+        s = {JalaliNaT}
+        assert JalaliNaT in s
+
+    def test_nat_equality(self):
+        """Test JalaliNaT equality comparisons."""
+        assert JalaliNaT == JalaliNaT
+        assert JalaliNaT == pd.NaT
+        assert JalaliNaT != JalaliTimestamp(1402, 1, 1)
+
+    def test_nat_inequality(self):
+        """Test JalaliNaT inequality comparisons."""
+        assert JalaliNaT == JalaliNaT
+        assert JalaliNaT != JalaliTimestamp(1402, 1, 1)
+
+    def test_nat_comparisons_return_false(self):
+        """Test that NaT comparisons (except ==, !=) return False."""
+        ts = JalaliTimestamp(1402, 1, 1)
+        assert not (JalaliNaT < ts)
+        assert not (JalaliNaT > ts)
+        assert not (JalaliNaT < JalaliNaT)
+        assert not (JalaliNaT > JalaliNaT)
+
+    def test_nat_arithmetic_returns_nat(self):
+        """Test that arithmetic with NaT returns NaT."""
+        result = JalaliNaT + timedelta(days=1)
+        assert result is JalaliNaT
+
+        result = JalaliNaT - timedelta(days=1)
+        assert result is JalaliNaT
+
+        result = timedelta(days=1) + JalaliNaT
+        assert result is JalaliNaT
+
+    def test_nat_properties_return_nan(self):
+        """Test that NaT properties return NaN."""
+        assert math.isnan(JalaliNaT.year)
+        assert math.isnan(JalaliNaT.month)
+        assert math.isnan(JalaliNaT.day)
+        assert math.isnan(JalaliNaT.hour)
+        assert math.isnan(JalaliNaT.quarter)
+        assert math.isnan(JalaliNaT.dayofweek)
+
+    def test_nat_boolean_properties_return_false(self):
+        """Test that NaT boolean properties return False."""
+        assert JalaliNaT.is_leap_year is False
+        assert JalaliNaT.is_month_start is False
+        assert JalaliNaT.is_month_end is False
+        assert JalaliNaT.is_quarter_start is False
+        assert JalaliNaT.is_quarter_end is False
+        assert JalaliNaT.is_year_start is False
+        assert JalaliNaT.is_year_end is False
+
+    def test_nat_to_gregorian(self):
+        """Test NaT conversion to Gregorian returns pd.NaT."""
+        assert JalaliNaT.to_gregorian() is pd.NaT
+
+    def test_nat_to_datetime64(self):
+        """Test NaT conversion to datetime64 returns NaT."""
+        result = JalaliNaT.to_datetime64()
+        assert np.isnat(result)
+
+    def test_nat_strftime(self):
+        """Test NaT strftime returns 'NaT'."""
+        assert JalaliNaT.strftime("%Y-%m-%d") == "NaT"
+
+    def test_nat_isoformat(self):
+        """Test NaT isoformat returns 'NaT'."""
+        assert JalaliNaT.isoformat() == "NaT"
+
+    def test_nat_normalize(self):
+        """Test NaT normalize returns NaT."""
+        assert JalaliNaT.normalize() is JalaliNaT
+
+    def test_nat_replace(self):
+        """Test NaT replace returns NaT."""
+        assert JalaliNaT.replace(year=1402) is JalaliNaT
+
+    def test_nat_tz_methods(self):
+        """Test NaT timezone methods return NaT."""
+        assert JalaliNaT.tz_localize("UTC") is JalaliNaT
+        assert JalaliNaT.tz_convert("UTC") is JalaliNaT
+
+
+class TestIsNaJalali:
+    """Tests for isna_jalali function."""
+
+    def test_isna_jalali_nat(self):
+        """Test isna_jalali with JalaliNaT."""
+        assert isna_jalali(JalaliNaT) is True
+
+    def test_isna_jalali_pandas_nat(self):
+        """Test isna_jalali with pandas NaT."""
+        assert isna_jalali(pd.NaT) is True
+
+    def test_isna_jalali_none(self):
+        """Test isna_jalali with None."""
+        assert isna_jalali(None) is True
+
+    def test_isna_jalali_timestamp(self):
+        """Test isna_jalali with valid timestamp."""
+        ts = JalaliTimestamp(1402, 1, 1)
+        assert isna_jalali(ts) is False
+
+    def test_isna_jalali_nan(self):
+        """Test isna_jalali with float NaN."""
+        assert isna_jalali(float("nan")) is True
+
+
+class TestJalaliTimestampTimezone:
+    """Tests for JalaliTimestamp timezone methods."""
+
+    def test_tz_localize(self):
+        """Test localizing a tz-naive timestamp."""
+        ts = JalaliTimestamp(1402, 6, 15, 10, 30)
+        localized = ts.tz_localize("UTC")
+        assert localized.tz is not None
+        assert str(localized.tz) == "UTC"
+        # Date/time components should be unchanged
+        assert localized.year == 1402
+        assert localized.month == 6
+        assert localized.day == 15
+        assert localized.hour == 10
+        assert localized.minute == 30
+
+    def test_tz_localize_tehran(self):
+        """Test localizing to Asia/Tehran timezone."""
+        ts = JalaliTimestamp(1402, 6, 15, 10, 30)
+        localized = ts.tz_localize("Asia/Tehran")
+        assert localized.tz is not None
+        assert "Tehran" in str(localized.tz)
+
+    def test_tz_localize_already_aware_raises(self):
+        """Test that localizing tz-aware timestamp raises TypeError."""
+        ts = JalaliTimestamp(1402, 6, 15, 10, 30)
+        localized = ts.tz_localize("UTC")
+        with pytest.raises(TypeError, match="Cannot localize tz-aware"):
+            localized.tz_localize("Asia/Tehran")
+
+    def test_tz_convert(self):
+        """Test converting between timezones."""
+        ts = JalaliTimestamp(1402, 6, 15, 10, 30)
+        utc_ts = ts.tz_localize("UTC")
+        tehran_ts = utc_ts.tz_convert("Asia/Tehran")
+
+        assert tehran_ts.tz is not None
+        assert "Tehran" in str(tehran_ts.tz)
+        # Tehran is UTC+3:30, so 10:30 UTC = 14:00 Tehran
+        assert tehran_ts.hour == 14
+        assert tehran_ts.minute == 0
+
+    def test_tz_convert_naive_raises(self):
+        """Test that converting tz-naive timestamp raises TypeError."""
+        ts = JalaliTimestamp(1402, 6, 15, 10, 30)
+        with pytest.raises(TypeError, match="Cannot convert tz-naive"):
+            ts.tz_convert("Asia/Tehran")
+
+    def test_tz_localize_none_removes_tz(self):
+        """Test that localizing to None removes timezone."""
+        ts = JalaliTimestamp(1402, 6, 15, 10, 30)
+        localized = ts.tz_localize("UTC")
+        # Convert to None timezone (remove tz info)
+        naive = localized.tz_convert(None)
+        assert naive.tz is None
+
+    def test_roundtrip_tz_conversion(self):
+        """Test roundtrip timezone conversion preserves time."""
+        ts = JalaliTimestamp(1402, 6, 15, 12, 0)
+        utc_ts = ts.tz_localize("UTC")
+        tehran_ts = utc_ts.tz_convert("Asia/Tehran")
+        back_to_utc = tehran_ts.tz_convert("UTC")
+
+        # Should be back to original UTC time
+        assert back_to_utc.hour == 12
+        assert back_to_utc.minute == 0

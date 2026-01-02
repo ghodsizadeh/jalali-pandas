@@ -14,23 +14,28 @@ This document outlines the phased implementation plan for building full Jalali c
 - All infrastructure tasks completed
 - Calendar rules module with comprehensive tests
 - Compatibility layer in place
+- Legacy API compatibility module added
 
-### Phase 1: Core Types - ✅ MOSTLY COMPLETE
+### Phase 1: Core Types - ✅ COMPLETE
 - JalaliTimestamp fully functional
 - JalaliDatetimeDtype registered with pandas
 - JalaliDatetimeArray with all required methods
-- Remaining: NaT handling, timezone support, conversion module
+- JalaliNaT singleton for NaT handling
+- Timezone support (tz_localize, tz_convert)
+- Conversion module with vectorized operations
 
-### Phase 3: Frequency Offsets - ✅ MOSTLY COMPLETE
+### Phase 3: Frequency Offsets - ✅ COMPLETE
 - Base offset class implemented
 - Month, Quarter, Year offsets working
-- Remaining: Week offset, frequency alias registration
+- Week offset (JalaliWeek) with custom weekday support
+- Frequency alias registration (JME, JMS, JQE, JQS, JYE, JYS, JW)
+- parse_jalali_frequency() for string parsing
 
 ### Examples Created
 - `examples/01_basic_usage.py` - JalaliTimestamp basics
 - `examples/02_series_operations.py` - Series accessor usage
 - `examples/03_dataframe_operations.py` - DataFrame groupby
-- `examples/04_offsets.py` - Calendar offsets
+- `examples/04_offsets.py` - Calendar offsets (updated with week offset and aliases)
 
 ---
 
@@ -54,12 +59,12 @@ This document outlines the phased implementation plan for building full Jalali c
 #### 0.2 Type System Foundation
 - [x] Create `jalali_pandas/_typing.py` with type aliases
 - [x] Define protocols for Jalali types
-- [ ] Add type stubs for jdatetime if needed
+- [x] Add type stubs for jdatetime if needed (not needed - jdatetime has inline types)
 
 #### 0.3 Compatibility Layer
 - [x] Create `jalali_pandas/compat/pandas_compat.py`
 - [x] Detect pandas version and provide compatibility shims
-- [ ] Create `jalali_pandas/compat/legacy.py` for v0.x API
+- [x] Create `jalali_pandas/compat/legacy.py` for v0.x API
 
 #### 0.4 Calendar Rules Module
 - [x] Create `jalali_pandas/core/calendar.py`
@@ -99,16 +104,16 @@ This document outlines the phased implementation plan for building full Jalali c
 - [x] Implement arithmetic operators (+, -, with Timedelta)
 - [x] Implement comparison operators
 - [x] Implement `__hash__` for use as dict key
-- [ ] Add NaT handling
-- [ ] Add timezone support (tz_localize, tz_convert)
+- [x] Add NaT handling (JalaliNaT singleton, isna_jalali helper)
+- [x] Add timezone support (tz_localize, tz_convert)
 
 #### 1.2 Conversion Module
-- [ ] Create `jalali_pandas/core/conversion.py`
-- [ ] Implement scalar Jalali → Gregorian conversion
-- [ ] Implement scalar Gregorian → Jalali conversion
-- [ ] Implement vectorized conversions using NumPy
-- [ ] Optimize with lookup tables for common ranges
-- [ ] Add comprehensive round-trip tests
+- [x] Create `jalali_pandas/core/conversion.py`
+- [x] Implement scalar Jalali → Gregorian conversion
+- [x] Implement scalar Gregorian → Jalali conversion
+- [x] Implement vectorized conversions using NumPy
+- [x] Optimize with lookup tables for common ranges (using jdatetime)
+- [x] Add comprehensive round-trip tests
 
 #### 1.3 JalaliDatetimeDtype
 - [x] Create `jalali_pandas/core/dtypes.py`
@@ -216,7 +221,7 @@ This document outlines the phased implementation plan for building full Jalali c
   - Handle 30-day months (7-11)
   - Handle Esfand (29 or 30 days)
 - [x] Implement `JalaliMonthBegin`
-- [ ] Register frequency aliases ("JME", "JMS")
+- [x] Register frequency aliases ("JME", "JMS")
 
 #### 3.3 Quarter Offsets
 - [x] Create `jalali_pandas/offsets/quarter.py`
@@ -226,24 +231,24 @@ This document outlines the phased implementation plan for building full Jalali c
   - Q3 ends 30 Azar
   - Q4 ends 29/30 Esfand
 - [x] Implement `JalaliQuarterBegin`
-- [ ] Register frequency aliases ("JQE", "JQS")
+- [x] Register frequency aliases ("JQE", "JQS")
 
 #### 3.4 Year Offsets
 - [x] Create `jalali_pandas/offsets/year.py`
 - [x] Implement `JalaliYearEnd` (29/30 Esfand)
 - [x] Implement `JalaliYearBegin` (1 Farvardin)
-- [ ] Register frequency aliases ("JYE", "JYS")
+- [x] Register frequency aliases ("JYE", "JYS")
 
 #### 3.5 Week Offset
-- [ ] Create `jalali_pandas/offsets/week.py`
-- [ ] Implement `JalaliWeek` (Saturday-based by default)
-- [ ] Support custom weekday parameter
-- [ ] Register frequency alias ("JW")
+- [x] Create `jalali_pandas/offsets/week.py`
+- [x] Implement `JalaliWeek` (Saturday-based by default)
+- [x] Support custom weekday parameter
+- [x] Register frequency alias ("JW")
 
 #### 3.6 Offset Integration
 - [x] Create `jalali_pandas/offsets/__init__.py`
-- [ ] Register all offsets with pandas frequency system
-- [ ] Enable string frequency parsing ("JME", "2JME", etc.)
+- [x] Create `jalali_pandas/offsets/aliases.py` for frequency registration
+- [x] Enable string frequency parsing ("JME", "2JME", etc.)
 
 ### Deliverables
 - All Jalali offsets working

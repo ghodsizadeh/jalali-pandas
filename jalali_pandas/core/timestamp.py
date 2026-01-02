@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, time, timedelta
 from datetime import tzinfo as dt_tzinfo
-from typing import Optional, cast
+from typing import TYPE_CHECKING, Optional, Union, cast
 
 import jdatetime
 import numpy as np
@@ -18,6 +18,9 @@ from jalali_pandas.core.calendar import (
     week_of_year,
     weekday_of_jalali,
 )
+
+if TYPE_CHECKING:
+    from typing import Literal
 
 
 class JalaliTimestamp:
@@ -651,5 +654,289 @@ class JalaliTimestamp:
             tzinfo=self._tzinfo,
         )
 
+    # -------------------------------------------------------------------------
+    # Timezone Methods
+    # -------------------------------------------------------------------------
 
-__all__ = ["JalaliTimestamp"]
+    def tz_localize(
+        self,
+        tz: dt_tzinfo | str | None,
+        ambiguous: str = "raise",
+        nonexistent: str = "raise",
+    ) -> JalaliTimestamp:
+        """Localize tz-naive timestamp to a timezone.
+
+        Args:
+            tz: Timezone to localize to. Can be a timezone object or string.
+            ambiguous: How to handle ambiguous times. Defaults to 'raise'.
+            nonexistent: How to handle nonexistent times. Defaults to 'raise'.
+
+        Returns:
+            New JalaliTimestamp with timezone.
+
+        Raises:
+            TypeError: If timestamp is already tz-aware.
+        """
+        if self._tzinfo is not None:
+            raise TypeError(
+                "Cannot localize tz-aware timestamp. "
+                "Use tz_convert() to convert between timezones."
+            )
+
+        # Convert to Gregorian, localize, then convert back
+        gregorian = self.to_gregorian()
+        localized = gregorian.tz_localize(
+            tz, ambiguous=ambiguous, nonexistent=nonexistent
+        )
+
+        # Create new JalaliTimestamp with the timezone
+        return JalaliTimestamp(
+            year=self._year,
+            month=self._month,
+            day=self._day,
+            hour=self._hour,
+            minute=self._minute,
+            second=self._second,
+            microsecond=self._microsecond,
+            nanosecond=self._nanosecond,
+            tzinfo=localized.tzinfo,
+        )
+
+    def tz_convert(self, tz: dt_tzinfo | str | None) -> JalaliTimestamp:
+        """Convert tz-aware timestamp to another timezone.
+
+        Args:
+            tz: Target timezone. Can be a timezone object or string.
+
+        Returns:
+            New JalaliTimestamp in the target timezone.
+
+        Raises:
+            TypeError: If timestamp is tz-naive.
+        """
+        if self._tzinfo is None:
+            raise TypeError(
+                "Cannot convert tz-naive timestamp. "
+                "Use tz_localize() first to add timezone."
+            )
+
+        # Convert to Gregorian, convert timezone, then convert back to Jalali
+        gregorian = self.to_gregorian()
+        converted = gregorian.tz_convert(tz)
+
+        # Convert the new Gregorian time back to Jalali
+        return JalaliTimestamp.from_gregorian(converted)
+
+
+class _JalaliNaTType:
+    """Singleton class representing Not-a-Time for Jalali timestamps.
+
+    This is analogous to pandas.NaT for Jalali datetimes.
+    """
+
+    _instance: _JalaliNaTType | None = None
+
+    def __new__(cls) -> _JalaliNaTType:
+        if cls._instance is None:
+            cls._instance = object.__new__(cls)
+        return cls._instance
+
+    def __repr__(self) -> str:
+        return "JalaliNaT"
+
+    def __str__(self) -> str:
+        return "JalaliNaT"
+
+    def __bool__(self) -> Literal[False]:
+        return False
+
+    def __hash__(self) -> int:
+        return hash("JalaliNaT")
+
+    # Comparison operations - NaT comparisons always return False (except !=)
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, _JalaliNaTType) or other is pd.NaT
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __lt__(self, other: object) -> bool:
+        return False
+
+    def __le__(self, other: object) -> bool:
+        return isinstance(other, _JalaliNaTType)
+
+    def __gt__(self, other: object) -> bool:
+        return False
+
+    def __ge__(self, other: object) -> bool:
+        return isinstance(other, _JalaliNaTType)
+
+    # Arithmetic operations return NaT
+    def __add__(self, other: object) -> _JalaliNaTType:
+        return self
+
+    def __radd__(self, other: object) -> _JalaliNaTType:
+        return self
+
+    def __sub__(self, other: object) -> _JalaliNaTType:
+        return self
+
+    def __rsub__(self, other: object) -> _JalaliNaTType:
+        return self
+
+    # Properties return NaN or NaT equivalents
+    @property
+    def year(self) -> float:
+        return float("nan")
+
+    @property
+    def month(self) -> float:
+        return float("nan")
+
+    @property
+    def day(self) -> float:
+        return float("nan")
+
+    @property
+    def hour(self) -> float:
+        return float("nan")
+
+    @property
+    def minute(self) -> float:
+        return float("nan")
+
+    @property
+    def second(self) -> float:
+        return float("nan")
+
+    @property
+    def microsecond(self) -> float:
+        return float("nan")
+
+    @property
+    def nanosecond(self) -> float:
+        return float("nan")
+
+    @property
+    def tzinfo(self) -> None:
+        return None
+
+    @property
+    def tz(self) -> None:
+        return None
+
+    @property
+    def quarter(self) -> float:
+        return float("nan")
+
+    @property
+    def dayofweek(self) -> float:
+        return float("nan")
+
+    @property
+    def weekday(self) -> float:
+        return float("nan")
+
+    @property
+    def dayofyear(self) -> float:
+        return float("nan")
+
+    @property
+    def week(self) -> float:
+        return float("nan")
+
+    @property
+    def weekofyear(self) -> float:
+        return float("nan")
+
+    @property
+    def days_in_month(self) -> float:
+        return float("nan")
+
+    @property
+    def daysinmonth(self) -> float:
+        return float("nan")
+
+    @property
+    def is_leap_year(self) -> bool:
+        return False
+
+    @property
+    def is_month_start(self) -> bool:
+        return False
+
+    @property
+    def is_month_end(self) -> bool:
+        return False
+
+    @property
+    def is_quarter_start(self) -> bool:
+        return False
+
+    @property
+    def is_quarter_end(self) -> bool:
+        return False
+
+    @property
+    def is_year_start(self) -> bool:
+        return False
+
+    @property
+    def is_year_end(self) -> bool:
+        return False
+
+    def to_gregorian(self) -> pd.NaTType:  # type: ignore[name-defined]
+        return pd.NaT
+
+    def to_pydatetime(self) -> None:
+        return None
+
+    def to_datetime64(self) -> np.datetime64:
+        return np.datetime64("NaT")
+
+    def strftime(self, _fmt: str) -> str:
+        return "NaT"
+
+    def isoformat(self, _sep: str = "T") -> str:
+        return "NaT"
+
+    def normalize(self) -> _JalaliNaTType:
+        return self
+
+    def date(self) -> _JalaliNaTType:
+        return self
+
+    def time(self) -> None:
+        return None
+
+    def replace(self, **_kwargs: object) -> _JalaliNaTType:
+        return self
+
+    def tz_localize(self, _tz: object) -> _JalaliNaTType:
+        return self
+
+    def tz_convert(self, _tz: object) -> _JalaliNaTType:
+        return self
+
+
+# Singleton instance
+JalaliNaT: _JalaliNaTType = _JalaliNaTType()
+
+# Type alias for JalaliTimestamp or NaT
+JalaliTimestampOrNaT = Union["JalaliTimestamp", _JalaliNaTType]
+
+
+def isna_jalali(value: object) -> bool:
+    """Check if a value is JalaliNaT or pandas NaT.
+
+    Args:
+        value: Value to check.
+
+    Returns:
+        True if value is NaT.
+    """
+    return isinstance(value, _JalaliNaTType) or value is pd.NaT or pd.isna(value)
+
+
+__all__ = ["JalaliTimestamp", "JalaliNaT", "isna_jalali", "JalaliTimestampOrNaT"]
