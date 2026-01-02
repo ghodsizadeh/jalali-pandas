@@ -46,6 +46,13 @@ This document outlines the phased implementation plan for building full Jalali c
 - Shifting works with JalaliDatetimeIndex and Timedelta/JalaliOffset
 - Comprehensive tests for all time series operations
 
+### Phase 5: Enhanced Accessors - ✅ COMPLETE
+- JalaliSeriesAccessor with all properties (dayofyear, daysinmonth, is_* flags)
+- JalaliSeriesAccessor with all methods (strftime, normalize, floor/ceil/round, tz_localize/tz_convert, month_name/day_name)
+- JalaliDataFrameAccessor with enhanced groupby, resample, convert_columns, filter methods
+- Full type annotations on both accessors
+- 76 new tests for accessor functionality
+
 ### Examples Created
 - `examples/01_basic_usage.py` - JalaliTimestamp basics
 - `examples/02_series_operations.py` - Series accessor usage
@@ -331,27 +338,35 @@ This document outlines the phased implementation plan for building full Jalali c
 ### Tasks
 
 #### 5.1 Series Accessor Enhancement
-- [ ] Update `jalali_pandas/accessors/series.py`
-- [ ] Add all missing properties (dayofyear, daysinmonth, is_* flags)
-- [ ] Add `strftime()` method
-- [ ] Add `normalize()` method
-- [ ] Add `floor()`, `ceil()`, `round()` methods
-- [ ] Add `tz_localize()`, `tz_convert()` methods
-- [ ] Add `month_name()`, `day_name()` methods
-- [ ] Add `date`, `time` properties
-- [ ] Add full type annotations
+- [x] Update `jalali_pandas/accessors/series.py`
+- [x] Add all missing properties (dayofyear, daysinmonth, is_* flags)
+- [x] Add `strftime()` method
+- [x] Add `normalize()` method
+- [x] Add `floor()`, `ceil()`, `round()` methods
+- [x] Add `tz_localize()`, `tz_convert()` methods
+- [x] Add `month_name()`, `day_name()` methods
+- [x] Add `date`, `time` properties
+- [x] Add full type annotations
 
 #### 5.2 DataFrame Accessor Enhancement
-- [ ] Update `jalali_pandas/accessors/dataframe.py`
-- [ ] Add `set_date_column()` method
-- [ ] Update `groupby()` to use new infrastructure
-- [ ] Implement `resample()` properly
-- [ ] Add `convert_columns()` method
-- [ ] Add full type annotations
+- [x] Update `jalali_pandas/accessors/dataframe.py`
+- [x] Add `set_date_column()` method
+- [x] Update `groupby()` to use new infrastructure
+- [x] Implement `resample()` properly
+- [x] Add `convert_columns()` method
+- [x] Add full type annotations
 
 ### Deliverables
 - Feature-complete accessors
 - Full type annotations
+
+### Completion Notes (2026-01-02)
+- Created `jalali_pandas/accessors/series.py` with JalaliSeriesAccessor class
+- Created `jalali_pandas/accessors/dataframe.py` with JalaliDataFrameAccessor class
+- Series accessor includes: all date/time properties, boolean flags (is_leap_year, is_month_start, etc.), strftime, normalize, floor/ceil/round, month_name/day_name, tz_localize/tz_convert
+- DataFrame accessor includes: set_date_column, groupby (extended), resample, convert_columns, to_period, filter_by_year/month/quarter/date_range
+- 76 new tests in `tests/test_accessors.py`
+- Total: 469 tests passing, 83% coverage
 
 ---
 

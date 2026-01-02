@@ -17,7 +17,6 @@ else:
     DataFrameGroupByT = DataFrameGroupByRuntime
 
 
-@pd.api.extensions.register_dataframe_accessor("jalali")
 class JalaliDataframeAccessor:
     """Accessor methods on pandas DataFrames to handle Jalali dates."""
 
