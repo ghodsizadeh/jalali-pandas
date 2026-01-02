@@ -42,7 +42,6 @@ docs/
 │   │   ├── index.md              # Getting started overview
 │   │   ├── installation.md       # Installation guide
 │   │   ├── quickstart.md         # 5-minute quickstart
-│   │   └── migration.md          # Migration from v0.x
 │   │
 │   ├── user-guide/
 │   │   ├── index.md              # User guide overview
@@ -801,7 +800,6 @@ uv run mkdocs gh-deploy
 - [ ] Home page with feature overview
 - [ ] Installation guide
 - [ ] Quickstart tutorial
-- [ ] Migration guide from v0.x
 - [ ] Complete API reference (auto-generated)
 - [ ] User guide for all major features
 - [ ] At least 3 real-world examples

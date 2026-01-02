@@ -13,8 +13,6 @@ This document outlines the phased implementation plan for building full Jalali c
 ### Phase 0: Foundation - ✅ COMPLETE
 - All infrastructure tasks completed
 - Calendar rules module with comprehensive tests
-- Compatibility layer in place
-- Legacy API compatibility module added
 
 ### Phase 1: Core Types - ✅ COMPLETE
 - JalaliTimestamp fully functional
@@ -44,7 +42,6 @@ This document outlines the phased implementation plan for building full Jalali c
 ### Goals
 - Set up modern project infrastructure
 - Establish type system foundation
-- Create compatibility layer
 
 ### Tasks
 
@@ -61,12 +58,7 @@ This document outlines the phased implementation plan for building full Jalali c
 - [x] Define protocols for Jalali types
 - [x] Add type stubs for jdatetime if needed (not needed - jdatetime has inline types)
 
-#### 0.3 Compatibility Layer
-- [x] Create `jalali_pandas/compat/pandas_compat.py`
-- [x] Detect pandas version and provide compatibility shims
-- [x] Create `jalali_pandas/compat/legacy.py` for v0.x API
-
-#### 0.4 Calendar Rules Module
+#### 0.3 Calendar Rules Module
 - [x] Create `jalali_pandas/core/calendar.py`
 - [x] Implement leap year detection (2820-year cycle)
 - [x] Implement month length calculation
@@ -309,7 +301,6 @@ This document outlines the phased implementation plan for building full Jalali c
 ### Goals
 - Enhance Series accessor with all properties/methods
 - Enhance DataFrame accessor
-- Maintain backward compatibility
 
 ### Tasks
 
@@ -323,7 +314,6 @@ This document outlines the phased implementation plan for building full Jalali c
 - [ ] Add `month_name()`, `day_name()` methods
 - [ ] Add `date`, `time` properties
 - [ ] Add full type annotations
-- [ ] Maintain backward compatibility with v0.x
 
 #### 5.2 DataFrame Accessor Enhancement
 - [ ] Update `jalali_pandas/accessors/dataframe.py`
@@ -332,17 +322,10 @@ This document outlines the phased implementation plan for building full Jalali c
 - [ ] Implement `resample()` properly
 - [ ] Add `convert_columns()` method
 - [ ] Add full type annotations
-- [ ] Maintain backward compatibility with v0.x
-
-#### 5.3 Backward Compatibility
-- [ ] Test all v0.x API still works
-- [ ] Add deprecation warnings for changed behavior
-- [ ] Document migration path
 
 ### Deliverables
 - Feature-complete accessors
 - Full type annotations
-- Backward compatible with v0.x
 
 ---
 
@@ -397,7 +380,6 @@ This document outlines the phased implementation plan for building full Jalali c
 - [ ] Write quickstart tutorial
 - [ ] Write user guide sections
 - [ ] Generate API reference
-- [ ] Write migration guide
 - [ ] Add examples
 - [ ] Deploy to GitHub Pages
 
@@ -447,7 +429,6 @@ This document outlines the phased implementation plan for building full Jalali c
 | pandas ExtensionArray limitations | Research early, design around limitations |
 | Performance overhead | Profile early, optimize iteratively |
 | Timezone edge cases | Delegate to pandas for tz ops, test thoroughly |
-| Backward compatibility breaks | Maintain v0.x API, add deprecation warnings |
 
 ### Schedule Risks
 
@@ -469,7 +450,6 @@ This document outlines the phased implementation plan for building full Jalali c
 - [ ] 90%+ test coverage
 - [ ] Type checking passes (mypy strict)
 - [ ] Documentation complete
-- [ ] Backward compatible with v0.x
 - [ ] Performance acceptable (benchmarked)
 
 ### Post-Release Goals
