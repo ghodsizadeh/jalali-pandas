@@ -65,9 +65,9 @@ def jalali_to_gregorian_vectorized(
         Tuple of (gregorian_year, gregorian_month, gregorian_day) arrays.
     """
     n = len(year)
-    g_year = np.empty(n, dtype=np.int64)
-    g_month = np.empty(n, dtype=np.int64)
-    g_day = np.empty(n, dtype=np.int64)
+    g_year: NDArray[np.int64] = np.empty(n, dtype=np.int64)
+    g_month: NDArray[np.int64] = np.empty(n, dtype=np.int64)
+    g_day: NDArray[np.int64] = np.empty(n, dtype=np.int64)
 
     for i in range(n):
         gy, gm, gd = jalali_to_gregorian_scalar(
@@ -96,9 +96,9 @@ def gregorian_to_jalali_vectorized(
         Tuple of (jalali_year, jalali_month, jalali_day) arrays.
     """
     n = len(year)
-    j_year = np.empty(n, dtype=np.int64)
-    j_month = np.empty(n, dtype=np.int64)
-    j_day = np.empty(n, dtype=np.int64)
+    j_year: NDArray[np.int64] = np.empty(n, dtype=np.int64)
+    j_month: NDArray[np.int64] = np.empty(n, dtype=np.int64)
+    j_day: NDArray[np.int64] = np.empty(n, dtype=np.int64)
 
     for i in range(n):
         jy, jm, jd = gregorian_to_jalali_scalar(
