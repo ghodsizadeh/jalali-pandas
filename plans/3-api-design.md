@@ -297,7 +297,7 @@ import jalali_pandas  # Registers accessor
 
 series = pd.Series([...])  # Jalali datetime series
 
-# Existing API (backward compatible)
+# Existing API
 series.jalali.to_jalali()
 series.jalali.to_gregorian()
 series.jalali.parse_jalali(format)
@@ -346,7 +346,7 @@ import jalali_pandas
 
 df = pd.DataFrame(...)
 
-# Existing API (backward compatible)
+# Existing API
 df.jalali.groupby("year")
 df.jalali.groupby("ym")
 df.jalali.groupby(["year", "month", "day"])
