@@ -680,10 +680,13 @@ class JalaliSeriesAccessor:
         """
         self._validate()
         gregorian = self.to_gregorian()
-        dt_series: pd.Series = pd.to_datetime(gregorian)
+        dt_index = pd.DatetimeIndex(pd.to_datetime(gregorian))
+        localized = dt_index.tz_localize(
+            tz, ambiguous=ambiguous, nonexistent=nonexistent
+        )
         return cast(
             pd.Series,
-            dt_series.dt.tz_localize(tz, ambiguous=ambiguous, nonexistent=nonexistent),
+            pd.Series(localized, index=self._obj.index, name=self._obj.name),
         )
 
     def tz_convert(self, tz: dt_tzinfo | str | None) -> pd.Series:
@@ -700,8 +703,12 @@ class JalaliSeriesAccessor:
         """
         self._validate()
         gregorian = self.to_gregorian()
-        dt_series: pd.Series = pd.to_datetime(gregorian)
-        return cast(pd.Series, dt_series.dt.tz_convert(tz))
+        dt_index = pd.DatetimeIndex(pd.to_datetime(gregorian))
+        converted = dt_index.tz_convert(tz)
+        return cast(
+            pd.Series,
+            pd.Series(converted, index=self._obj.index, name=self._obj.name),
+        )
 
 
 __all__ = ["JalaliSeriesAccessor"]
