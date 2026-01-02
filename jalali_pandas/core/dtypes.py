@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+import builtins
+from typing import TYPE_CHECKING
 
-import numpy as np
 import pandas as pd
 from pandas.api.extensions import ExtensionDtype, register_extension_dtype
 
@@ -50,7 +50,7 @@ class JalaliDatetimeDtype(ExtensionDtype):
         return self._tz
 
     @classmethod
-    def construct_array_type(cls) -> type[JalaliDatetimeArray]:
+    def construct_array_type(cls) -> builtins.type[JalaliDatetimeArray]:
         """Return the array type associated with this dtype.
 
         Returns:

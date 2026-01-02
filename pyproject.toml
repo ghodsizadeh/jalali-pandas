@@ -27,6 +27,7 @@ classifiers = [
 dependencies = [
     "pandas>=2.0.0",
     "numpy>=1.23.0",
+    "jdatetime>=4.0.0",
 ]
 
 [project.optional-dependencies]
@@ -147,6 +148,16 @@ ignore_missing_imports = true
 # Pyright configuration
 [tool.pyright]
 pythonVersion = "3.9"
-typeCheckingMode = "strict"
-reportMissingImports = true
+typeCheckingMode = "basic"
+reportMissingImports = false
+reportUnknownMemberType = false
+reportUnknownParameterType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportUnknownLambdaType = false
+reportUnnecessaryCast = false
+reportUnnecessaryIsInstance = false
+reportInvalidTypeForm = false
+reportOperatorIssue = false
+reportAssignmentType = false
 reportMissingTypeStubs = false

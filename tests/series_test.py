@@ -1,12 +1,10 @@
-"""Test Series class
-"""
+"""Test Series class"""
+
 import jdatetime
 import pandas as pd
 import pytest
-from jalali_pandas import (  # pylint: disable=W0611
-    JalaliDataframeAccessor,
-    JalaliSerieAccessor,
-)
+
+import jalali_pandas  # noqa: F401
 
 
 class TestJalaliSerie:
@@ -43,7 +41,7 @@ class TestJalaliSerie:
         """Test jalali raise error on wrong columns"""
         df = self.df
         with pytest.raises(TypeError):
-            df["date"].jalali.year  # pylint: disable=W0104
+            _ = df["date"].jalali.year
 
     def test_jalali_property(self):
         """Test jalali property like year, month, weeknumber"""

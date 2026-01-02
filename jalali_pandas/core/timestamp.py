@@ -2,25 +2,22 @@
 
 from __future__ import annotations
 
-from datetime import datetime, time, timedelta, tzinfo
-from typing import TYPE_CHECKING, Any, overload
+from datetime import datetime, time, timedelta
+from datetime import tzinfo as dt_tzinfo
+from typing import Optional, cast
 
+import jdatetime
 import numpy as np
 import pandas as pd
 
 from jalali_pandas.core.calendar import (
     days_in_month,
     is_leap_year,
-    jalali_to_jdn,
-    jdn_to_jalali,
     quarter_of_month,
     validate_jalali_date,
     week_of_year,
     weekday_of_jalali,
 )
-
-if TYPE_CHECKING:
-    from jalali_pandas.offsets.base import JalaliOffset
 
 
 class JalaliTimestamp:
@@ -72,7 +69,7 @@ class JalaliTimestamp:
         second: int = 0,
         microsecond: int = 0,
         nanosecond: int = 0,
-        tzinfo: tzinfo | None = None,
+        tzinfo: dt_tzinfo | None = None,
     ) -> None:
         """Initialize a JalaliTimestamp.
 
@@ -159,12 +156,12 @@ class JalaliTimestamp:
         return self._nanosecond
 
     @property
-    def tzinfo(self) -> tzinfo | None:
+    def tzinfo(self) -> dt_tzinfo | None:
         """Timezone information."""
         return self._tzinfo
 
     @property
-    def tz(self) -> tzinfo | None:
+    def tz(self) -> dt_tzinfo | None:
         """Alias for tzinfo."""
         return self._tzinfo
 
@@ -262,22 +259,26 @@ class JalaliTimestamp:
         if self._gregorian_cache is not None:
             return self._gregorian_cache
 
-        jdn = jalali_to_jdn(self._year, self._month, self._day)
-        # Convert JDN to Gregorian date
-        # JDN 2440588 = 1970-01-01
-        days_from_epoch = jdn - 2440588
-
+        gregorian = jdatetime.datetime(
+            self._year,
+            self._month,
+            self._day,
+            self._hour,
+            self._minute,
+            self._second,
+            self._microsecond,
+        ).togregorian()
         ts = pd.Timestamp(
-            year=1970,
-            month=1,
-            day=1,
-            hour=self._hour,
-            minute=self._minute,
-            second=self._second,
-            microsecond=self._microsecond,
+            year=gregorian.year,
+            month=gregorian.month,
+            day=gregorian.day,
+            hour=gregorian.hour,
+            minute=gregorian.minute,
+            second=gregorian.second,
+            microsecond=gregorian.microsecond,
             nanosecond=self._nanosecond,
             tz=self._tzinfo,
-        ) + pd.Timedelta(days=days_from_epoch)
+        )
 
         self._gregorian_cache = ts
         return ts
@@ -302,7 +303,7 @@ class JalaliTimestamp:
     def from_gregorian(
         cls,
         ts: pd.Timestamp | datetime | str,
-        tz: tzinfo | str | None = None,
+        tz: dt_tzinfo | str | None = None,
     ) -> JalaliTimestamp:
         """Create JalaliTimestamp from Gregorian datetime.
 
@@ -313,35 +314,32 @@ class JalaliTimestamp:
         Returns:
             Equivalent JalaliTimestamp.
         """
-        if isinstance(ts, str):
-            ts = pd.Timestamp(ts)
-        elif isinstance(ts, datetime) and not isinstance(ts, pd.Timestamp):
+        if (
+            isinstance(ts, str)
+            or isinstance(ts, datetime)
+            and not isinstance(ts, pd.Timestamp)
+        ):
             ts = pd.Timestamp(ts)
 
         if tz is not None:
             ts = ts.tz_localize(tz) if ts.tzinfo is None else ts.tz_convert(tz)
 
-        # Convert to JDN
-        jdn = (
-            ts.toordinal() + 1721425 - 1  # Adjust for Julian Day Number calculation
-        )
-
-        year, month, day = jdn_to_jalali(jdn)
+        jalali = jdatetime.datetime.fromgregorian(datetime=ts.to_pydatetime())
 
         return cls(
-            year=year,
-            month=month,
-            day=day,
-            hour=ts.hour,
-            minute=ts.minute,
-            second=ts.second,
-            microsecond=ts.microsecond,
+            year=jalali.year,
+            month=jalali.month,
+            day=jalali.day,
+            hour=jalali.hour,
+            minute=jalali.minute,
+            second=jalali.second,
+            microsecond=jalali.microsecond,
             nanosecond=ts.nanosecond,
             tzinfo=ts.tzinfo,
         )
 
     @classmethod
-    def now(cls, tz: tzinfo | str | None = None) -> JalaliTimestamp:
+    def now(cls, tz: dt_tzinfo | str | None = None) -> JalaliTimestamp:
         """Get current JalaliTimestamp.
 
         Args:
@@ -593,7 +591,7 @@ class JalaliTimestamp:
         second: int | None = None,
         microsecond: int | None = None,
         nanosecond: int | None = None,
-        tzinfo: tzinfo | None = ...,  # type: ignore[assignment]
+        tzinfo: dt_tzinfo | None | object = ...,
     ) -> JalaliTimestamp:
         """Return timestamp with replaced components.
 
@@ -620,7 +618,7 @@ class JalaliTimestamp:
             second=second if second is not None else self._second,
             microsecond=microsecond if microsecond is not None else self._microsecond,
             nanosecond=nanosecond if nanosecond is not None else self._nanosecond,
-            tzinfo=self._tzinfo if tzinfo is ... else tzinfo,
+            tzinfo=self._tzinfo if tzinfo is ... else cast(Optional[dt_tzinfo], tzinfo),
         )
 
     def normalize(self) -> JalaliTimestamp:

@@ -2,18 +2,17 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Sequence
+from collections.abc import Iterator, Sequence
+from typing import Any, cast, overload
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 from pandas.api.extensions import ExtensionArray
-from pandas.core.arrays import ExtensionArray as ExtensionArrayBase
 
+from jalali_pandas._typing import NaTType
 from jalali_pandas.core.dtypes import JalaliDatetimeDtype
 from jalali_pandas.core.timestamp import JalaliTimestamp
-
-if TYPE_CHECKING:
-    from pandas._typing import NumpyValueArrayLike
 
 
 class JalaliDatetimeArray(ExtensionArray):
@@ -35,7 +34,7 @@ class JalaliDatetimeArray(ExtensionArray):
     """
 
     _dtype: JalaliDatetimeDtype
-    _data: np.ndarray  # Object array of JalaliTimestamp or NaT
+    _data: npt.NDArray[np.object_]  # Object array of JalaliTimestamp or NaT
 
     def __init__(
         self,
@@ -64,18 +63,26 @@ class JalaliDatetimeArray(ExtensionArray):
     @property
     def nbytes(self) -> int:
         """Return the number of bytes in the array."""
-        return self._data.nbytes
+        return int(self._data.nbytes)
 
     def __len__(self) -> int:
         """Return the length of the array."""
         return len(self._data)
 
-    def __getitem__(self, key: Any) -> JalaliTimestamp | JalaliDatetimeArray:
+    @overload
+    def __getitem__(self, key: int) -> JalaliTimestamp | NaTType: ...
+
+    @overload
+    def __getitem__(
+        self, key: slice | Sequence[int] | npt.NDArray[np.bool_]
+    ) -> JalaliDatetimeArray: ...
+
+    def __getitem__(self, key: Any) -> Any:
         """Get item(s) from the array."""
         result = self._data[key]
 
         if isinstance(result, np.ndarray):
-            return type(self)(result, dtype=self._dtype)
+            return type(self)(cast(npt.NDArray[np.object_], result), dtype=self._dtype)
 
         return result
 
@@ -85,25 +92,30 @@ class JalaliDatetimeArray(ExtensionArray):
             self._data[key] = value
         elif pd.isna(value):
             self._data[key] = pd.NaT
-        elif isinstance(value, (list, np.ndarray, JalaliDatetimeArray)):
-            values = self._from_sequence(value, dtype=self._dtype)
+        elif isinstance(value, JalaliDatetimeArray):
+            self._data[key] = value._data
+        elif isinstance(value, (list, np.ndarray)):
+            values = self._from_sequence(cast(Sequence[Any], value), dtype=self._dtype)
             self._data[key] = values._data
         else:
             raise TypeError(f"Cannot set {type(value)} in JalaliDatetimeArray")
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         """Iterate over the array."""
         return iter(self._data)
 
-    def __eq__(self, other: Any) -> np.ndarray:
+    def __eq__(self, other: Any) -> Any:
         """Element-wise equality comparison."""
         if isinstance(other, JalaliDatetimeArray):
-            return self._data == other._data
+            return cast(npt.NDArray[np.bool_], self._data == other._data)
         if isinstance(other, JalaliTimestamp):
-            return np.array([x == other for x in self._data])
+            return cast(
+                npt.NDArray[np.bool_],
+                np.array([x == other for x in self._data], dtype=bool),
+            )
         return NotImplemented
 
-    def __ne__(self, other: Any) -> np.ndarray:
+    def __ne__(self, other: Any) -> Any:
         """Element-wise inequality comparison."""
         result = self.__eq__(other)
         if result is NotImplemented:
@@ -128,7 +140,7 @@ class JalaliDatetimeArray(ExtensionArray):
         Returns:
             JalaliDatetimeArray instance.
         """
-        result = []
+        result: list[JalaliTimestamp | NaTType] = []
         for scalar in scalars:
             if isinstance(scalar, JalaliTimestamp):
                 result.append(scalar)
@@ -150,7 +162,7 @@ class JalaliDatetimeArray(ExtensionArray):
             else:
                 result.append(pd.NaT)
 
-        data = np.array(result, dtype=object)
+        data = cast(npt.NDArray[np.object_], np.array(result, dtype=object))
         return cls(data, dtype=dtype, copy=copy)
 
     @classmethod
@@ -175,7 +187,7 @@ class JalaliDatetimeArray(ExtensionArray):
 
     @classmethod
     def _from_factorized(
-        cls, values: np.ndarray, original: JalaliDatetimeArray
+        cls, values: npt.NDArray[np.object_], original: JalaliDatetimeArray
     ) -> JalaliDatetimeArray:
         """Reconstruct array from factorized values.
 
@@ -188,13 +200,16 @@ class JalaliDatetimeArray(ExtensionArray):
         """
         return cls(values, dtype=original.dtype)
 
-    def _values_for_factorize(self) -> tuple[np.ndarray, Any]:
+    def _values_for_factorize(self) -> tuple[npt.NDArray[np.object_], NaTType]:
         """Return values and NA value for factorization."""
         return self._data, pd.NaT
 
-    def isna(self) -> np.ndarray:
+    def isna(self) -> npt.NDArray[np.bool_]:
         """Return boolean array indicating NA values."""
-        return np.array([pd.isna(x) for x in self._data], dtype=bool)
+        return cast(
+            npt.NDArray[np.bool_],
+            np.array([pd.isna(x) for x in self._data], dtype=bool),
+        )
 
     def take(
         self,
@@ -217,15 +232,15 @@ class JalaliDatetimeArray(ExtensionArray):
             if fill_value is None:
                 fill_value = pd.NaT
 
-            result = []
+            result: list[object] = []
             for i in indices:
                 if i == -1:
                     result.append(fill_value)
                 else:
                     result.append(self._data[i])
-            data = np.array(result, dtype=object)
+            data = cast(npt.NDArray[np.object_], np.array(result, dtype=object))
         else:
-            data = self._data[list(indices)]
+            data = cast(npt.NDArray[np.object_], self._data[list(indices)])
 
         return type(self)(data, dtype=self._dtype)
 
@@ -245,7 +260,9 @@ class JalaliDatetimeArray(ExtensionArray):
         Returns:
             Concatenated JalaliDatetimeArray.
         """
-        data = np.concatenate([arr._data for arr in to_concat])
+        data = cast(
+            npt.NDArray[np.object_], np.concatenate([arr._data for arr in to_concat])
+        )
         return cls(data, dtype=to_concat[0].dtype)
 
     def __repr__(self) -> str:
@@ -260,73 +277,113 @@ class JalaliDatetimeArray(ExtensionArray):
     # -------------------------------------------------------------------------
 
     @property
-    def year(self) -> np.ndarray:
+    def year(self) -> npt.NDArray[np.float64]:
         """Return array of years."""
-        return np.array(
-            [x.year if not pd.isna(x) else np.nan for x in self._data], dtype=float
+        return cast(
+            npt.NDArray[np.float64],
+            np.array(
+                [x.year if not pd.isna(x) else np.nan for x in self._data],
+                dtype=float,
+            ),
         )
 
     @property
-    def month(self) -> np.ndarray:
+    def month(self) -> npt.NDArray[np.float64]:
         """Return array of months."""
-        return np.array(
-            [x.month if not pd.isna(x) else np.nan for x in self._data], dtype=float
+        return cast(
+            npt.NDArray[np.float64],
+            np.array(
+                [x.month if not pd.isna(x) else np.nan for x in self._data],
+                dtype=float,
+            ),
         )
 
     @property
-    def day(self) -> np.ndarray:
+    def day(self) -> npt.NDArray[np.float64]:
         """Return array of days."""
-        return np.array(
-            [x.day if not pd.isna(x) else np.nan for x in self._data], dtype=float
+        return cast(
+            npt.NDArray[np.float64],
+            np.array(
+                [x.day if not pd.isna(x) else np.nan for x in self._data],
+                dtype=float,
+            ),
         )
 
     @property
-    def hour(self) -> np.ndarray:
+    def hour(self) -> npt.NDArray[np.float64]:
         """Return array of hours."""
-        return np.array(
-            [x.hour if not pd.isna(x) else np.nan for x in self._data], dtype=float
+        return cast(
+            npt.NDArray[np.float64],
+            np.array(
+                [x.hour if not pd.isna(x) else np.nan for x in self._data],
+                dtype=float,
+            ),
         )
 
     @property
-    def minute(self) -> np.ndarray:
+    def minute(self) -> npt.NDArray[np.float64]:
         """Return array of minutes."""
-        return np.array(
-            [x.minute if not pd.isna(x) else np.nan for x in self._data], dtype=float
+        return cast(
+            npt.NDArray[np.float64],
+            np.array(
+                [x.minute if not pd.isna(x) else np.nan for x in self._data],
+                dtype=float,
+            ),
         )
 
     @property
-    def second(self) -> np.ndarray:
+    def second(self) -> npt.NDArray[np.float64]:
         """Return array of seconds."""
-        return np.array(
-            [x.second if not pd.isna(x) else np.nan for x in self._data], dtype=float
+        return cast(
+            npt.NDArray[np.float64],
+            np.array(
+                [x.second if not pd.isna(x) else np.nan for x in self._data],
+                dtype=float,
+            ),
         )
 
     @property
-    def quarter(self) -> np.ndarray:
+    def quarter(self) -> npt.NDArray[np.float64]:
         """Return array of quarters."""
-        return np.array(
-            [x.quarter if not pd.isna(x) else np.nan for x in self._data], dtype=float
+        return cast(
+            npt.NDArray[np.float64],
+            np.array(
+                [x.quarter if not pd.isna(x) else np.nan for x in self._data],
+                dtype=float,
+            ),
         )
 
     @property
-    def dayofweek(self) -> np.ndarray:
+    def dayofweek(self) -> npt.NDArray[np.float64]:
         """Return array of day of week values."""
-        return np.array(
-            [x.dayofweek if not pd.isna(x) else np.nan for x in self._data], dtype=float
+        return cast(
+            npt.NDArray[np.float64],
+            np.array(
+                [x.dayofweek if not pd.isna(x) else np.nan for x in self._data],
+                dtype=float,
+            ),
         )
 
     @property
-    def dayofyear(self) -> np.ndarray:
+    def dayofyear(self) -> npt.NDArray[np.float64]:
         """Return array of day of year values."""
-        return np.array(
-            [x.dayofyear if not pd.isna(x) else np.nan for x in self._data], dtype=float
+        return cast(
+            npt.NDArray[np.float64],
+            np.array(
+                [x.dayofyear if not pd.isna(x) else np.nan for x in self._data],
+                dtype=float,
+            ),
         )
 
     @property
-    def week(self) -> np.ndarray:
+    def week(self) -> npt.NDArray[np.float64]:
         """Return array of week numbers."""
-        return np.array(
-            [x.week if not pd.isna(x) else np.nan for x in self._data], dtype=float
+        return cast(
+            npt.NDArray[np.float64],
+            np.array(
+                [x.week if not pd.isna(x) else np.nan for x in self._data],
+                dtype=float,
+            ),
         )
 
     def to_gregorian(self) -> pd.DatetimeIndex:
@@ -340,7 +397,7 @@ class JalaliDatetimeArray(ExtensionArray):
         ]
         return pd.DatetimeIndex(timestamps)
 
-    def strftime(self, fmt: str) -> np.ndarray:
+    def strftime(self, fmt: str) -> npt.NDArray[np.object_]:
         """Format timestamps as strings.
 
         Args:
@@ -349,9 +406,12 @@ class JalaliDatetimeArray(ExtensionArray):
         Returns:
             Array of formatted strings.
         """
-        return np.array(
-            [x.strftime(fmt) if not pd.isna(x) else None for x in self._data],
-            dtype=object,
+        return cast(
+            npt.NDArray[np.object_],
+            np.array(
+                [x.strftime(fmt) if not pd.isna(x) else None for x in self._data],
+                dtype=object,
+            ),
         )
 
 

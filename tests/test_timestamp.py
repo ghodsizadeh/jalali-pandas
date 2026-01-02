@@ -1,8 +1,9 @@
 """Tests for JalaliTimestamp."""
 
-import pytest
-import pandas as pd
 from datetime import timedelta
+
+import pandas as pd
+import pytest
 
 from jalali_pandas import JalaliTimestamp
 

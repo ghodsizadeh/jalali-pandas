@@ -72,11 +72,14 @@ WEEKDAY_NAMES_EN: tuple[str, ...] = (
     "Jomeh",
 )
 
+# Leap year remainders in the 33-year cycle (jdatetime-compatible)
+LEAP_YEAR_REMAINDERS: tuple[int, ...] = (1, 5, 9, 13, 17, 22, 26, 30)
+
 
 def is_leap_year(year: int) -> bool:
     """Check if a Jalali year is a leap year.
 
-    Uses the 2820-year cycle algorithm for accurate leap year calculation.
+    Uses the 33-year cycle algorithm used by jdatetime.
 
     Args:
         year: Jalali year.
@@ -84,11 +87,7 @@ def is_leap_year(year: int) -> bool:
     Returns:
         True if the year is a leap year, False otherwise.
     """
-    # Algorithm based on the 2820-year cycle
-    # Leap years follow a specific pattern within 128-year sub-cycles
-    a = year - 474 if year > 0 else year - 473
-    b = a % 2820
-    return ((b * 682) % 2816) < 682
+    return year % 33 in LEAP_YEAR_REMAINDERS
 
 
 def is_leap_year_vectorized(years: npt.NDArray[np.int64]) -> npt.NDArray[np.bool_]:
@@ -100,9 +99,8 @@ def is_leap_year_vectorized(years: npt.NDArray[np.int64]) -> npt.NDArray[np.bool
     Returns:
         Boolean array indicating leap years.
     """
-    a = np.where(years > 0, years - 474, years - 473)
-    b = a % 2820
-    return ((b * 682) % 2816) < 682
+    remainders = years % 33
+    return np.isin(remainders, LEAP_YEAR_REMAINDERS)
 
 
 def days_in_year(year: int) -> int:
@@ -212,6 +210,9 @@ def day_of_year(year: int, month: int, day: int) -> int:
     Returns:
         Day of year (1-366).
     """
+    max_day = days_in_month(year, month)
+    if not 1 <= day <= max_day:
+        raise ValueError(f"Day must be 1-{max_day} for month {month}, got {day}")
     return MONTH_STARTS[month - 1] + day
 
 

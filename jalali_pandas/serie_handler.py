@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import jdatetime
 import pandas as pd
@@ -29,25 +29,28 @@ class JalaliSerieAccessor:
         if not all(isinstance(x, (str, jdatetime.date)) for x in self._obj):
             raise TypeError("pandas series must be jdatetime or string of jdate")
 
-    def to_jalali(self) -> pd.Series:
+    def to_jalali(self) -> pd.Series[Any]:
         """convert python datetime to jalali datetime.
 
         Returns:
             pd.Series:  pd.Series of jalali datetime.
         """
-        return self._obj.apply(lambda x: jdatetime.datetime.fromgregorian(date=x))
+        return cast(
+            pd.Series,
+            self._obj.apply(lambda x: jdatetime.datetime.fromgregorian(date=x)),
+        )
 
-    def to_gregorian(self) -> pd.Series:
+    def to_gregorian(self) -> pd.Series[Any]:
         """convert jalali datetime to python default datetime.
 
         Returns:
             pd.Series: pd.Series of python datetime.
         """
 
-        return self._obj.apply(jdatetime.datetime.togregorian)
+        return cast(pd.Series, self._obj.apply(jdatetime.datetime.togregorian))
 
     #  pylint: disable=redefined-builtin
-    def parse_jalali(self, format: str = "%Y-%m-%d") -> pd.Series:
+    def parse_jalali(self, format: str = "%Y-%m-%d") -> pd.Series[Any]:
         """[summary]
 
         Args:
@@ -56,20 +59,22 @@ class JalaliSerieAccessor:
         Returns:
             pd.Series: pd.Series of jalali datetime.
         """
-        return self._obj.apply(lambda x: jdatetime.datetime.strptime(x, format))
+        return cast(
+            pd.Series, self._obj.apply(lambda x: jdatetime.datetime.strptime(x, format))
+        )
 
     @property
-    def year(self) -> pd.Series:
+    def year(self) -> pd.Series[Any]:
         """get Jalali year
 
         Returns:
             pd.Series: Jalali year
         """
         self._validate()
-        return self._obj.apply(lambda x: x.year)
+        return cast(pd.Series, self._obj.apply(lambda x: x.year))
 
     @property
-    def month(self) -> pd.Series:
+    def month(self) -> pd.Series[Any]:
         """get Jalali
 
 
@@ -77,67 +82,67 @@ class JalaliSerieAccessor:
             pd.Series: Jalali month
         """
         self._validate()
-        return self._obj.apply(lambda x: x.month)
+        return cast(pd.Series, self._obj.apply(lambda x: x.month))
 
     @property
-    def day(self) -> pd.Series:
+    def day(self) -> pd.Series[Any]:
         """get Jalali day
 
         Returns:
             pd.Series: Jalali day
         """
         self._validate()
-        return self._obj.apply(lambda x: x.day)
+        return cast(pd.Series, self._obj.apply(lambda x: x.day))
 
     @property
-    def hour(self) -> pd.Series:
+    def hour(self) -> pd.Series[Any]:
         """get Jalali hour
 
         Returns:
             pd.Series: Jalali hour
         """
         self._validate()
-        return self._obj.apply(lambda x: x.hour)
+        return cast(pd.Series, self._obj.apply(lambda x: x.hour))
 
     @property
-    def minute(self) -> pd.Series:
+    def minute(self) -> pd.Series[Any]:
         """get Jalali minute
 
         Returns:
             pd.Series: Jalali minute
         """
         self._validate()
-        return self._obj.apply(lambda x: x.minute)
+        return cast(pd.Series, self._obj.apply(lambda x: x.minute))
 
     @property
-    def second(self) -> pd.Series:
+    def second(self) -> pd.Series[Any]:
         """get Jalali second
 
         Returns:
             pd.Series: Jalali second
         """
         self._validate()
-        return self._obj.apply(lambda x: x.second)
+        return cast(pd.Series, self._obj.apply(lambda x: x.second))
 
     @property
-    def weekday(self) -> pd.Series:
+    def weekday(self) -> pd.Series[Any]:
         """get Jalali weekday
 
         Returns:
             pd.Series: Jalali weekday
         """
         self._validate()
-        return self._obj.apply(lambda x: x.weekday())
+        return cast(pd.Series, self._obj.apply(lambda x: x.weekday()))
 
     @property
-    def weeknumber(self) -> pd.Series:
+    def weeknumber(self) -> pd.Series[Any]:
         """get Jalali day of year
 
         Returns:
             pd.Series: Jalali day of year
         """
         self._validate()
-        return self._obj.apply(lambda x: x.weeknumber())
+        return cast(pd.Series, self._obj.apply(lambda x: x.weeknumber()))
 
     @property
     def quarter(self) -> pd.Series[Any]:
@@ -148,4 +153,4 @@ class JalaliSerieAccessor:
         """
         self._validate()
         month = self.month
-        return month.apply(lambda x: (x - 1) // 3 + 1)
+        return cast(pd.Series, month.apply(lambda x: (x - 1) // 3 + 1))

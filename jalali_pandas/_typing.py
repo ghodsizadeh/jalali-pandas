@@ -17,10 +17,11 @@ from typing import (
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
+from pandas._libs.tslibs.nattype import NaTType as PandasNaTType
+from typing_extensions import TypeAlias
 
 if TYPE_CHECKING:
     from jalali_pandas.core.arrays import JalaliDatetimeArray
-    from jalali_pandas.core.dtypes import JalaliDatetimeDtype
     from jalali_pandas.core.indexes import JalaliDatetimeIndex
     from jalali_pandas.core.timestamp import JalaliTimestamp
     from jalali_pandas.offsets.base import JalaliOffset
@@ -30,7 +31,7 @@ if TYPE_CHECKING:
 # =============================================================================
 
 # Type for NaT
-NaTType = type(pd.NaT)
+NaTType: TypeAlias = PandasNaTType
 
 # Jalali scalar or NaT
 JalaliScalar = Union["JalaliTimestamp", NaTType]

@@ -2,13 +2,19 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import jdatetime
 import pandas as pd
+from pandas.core.groupby.generic import DataFrameGroupBy as DataFrameGroupByRuntime
+from typing_extensions import TypeAlias
 
 if TYPE_CHECKING:
-    from pandas.core.groupby import DataFrameGroupBy
+    from pandas.core.groupby.generic import DataFrameGroupBy
+
+    DataFrameGroupByT: TypeAlias = DataFrameGroupBy[pd.DataFrame, Any]
+else:
+    DataFrameGroupByT = DataFrameGroupByRuntime
 
 
 @pd.api.extensions.register_dataframe_accessor("jalali")
@@ -55,7 +61,7 @@ class JalaliDataframeAccessor:
         df["__weekday"] = df[self.jdate].jalali.weekday
         return df
 
-    def _clean_groupby(self, group: DataFrameGroupBy[Any]) -> DataFrameGroupBy[Any]:
+    def _clean_groupby(self, group: DataFrameGroupByT) -> DataFrameGroupByT:
         """Clean the groupby object by removing temp columns.
 
         Args:
@@ -64,10 +70,19 @@ class JalaliDataframeAccessor:
         Returns:
             Cleaned groupby object with only original columns.
         """
-        remaining_columns = list(set(self.columns).difference(self.TEMP_COLUMNS))
-        return group[remaining_columns]
+        numeric_columns: pd.Index[Any] = cast(
+            pd.DataFrame, self._obj.select_dtypes(include="number")
+        ).columns
+        remaining_columns = [
+            col
+            for col in numeric_columns
+            if col in set(self.columns).difference(self.TEMP_COLUMNS)
+        ]
+        if not remaining_columns:
+            return group
+        return cast(DataFrameGroupByT, group[remaining_columns])
 
-    def groupby(self, grouper: str | list[str] = "md") -> DataFrameGroupBy[Any]:
+    def groupby(self, grouper: str = "md") -> DataFrameGroupByT:
         """Group by Jalali date components.
 
         Args:
@@ -110,7 +125,7 @@ class JalaliDataframeAccessor:
         else:
             grouper_cols = [f"__{grouper}"]
 
-        group = df.groupby(grouper_cols)
+        group = cast(DataFrameGroupByT, df.groupby(grouper_cols))
         return self._clean_groupby(group)
 
     def resample(self, resample_type: str) -> pd.DataFrame:

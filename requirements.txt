@@ -1,6 +1,7 @@
 # Core dependencies
 pandas>=2.0.0
 numpy>=1.23.0
+jdatetime>=4.0.0
 
 # Development dependencies (install with: pip install -e ".[dev]")
 # See pyproject.toml for full dev dependencies
