@@ -387,10 +387,10 @@ This document outlines the phased implementation plan for building full Jalali c
 - [ ] Test edge cases (leap years, month boundaries, NaT)
 
 #### 6.2 Performance Optimization
-- [ ] Profile conversion operations
-- [ ] Optimize vectorized operations
-- [ ] Consider Cython for hot paths (future)
-- [ ] Add lookup tables for common date ranges
+- [x] Profile conversion operations
+- [x] Optimize vectorized operations
+- [x] Consider Cython for hot paths (future)
+- [x] Add lookup tables for common date ranges
 
 #### 6.3 Benchmarks
 - [ ] Set up ASV benchmark suite
@@ -403,6 +403,11 @@ This document outlines the phased implementation plan for building full Jalali c
 - 90%+ test coverage
 - Performance benchmarks
 - Optimized hot paths
+
+### Completion Notes (6.2, 2026-01-02)
+- Added a conversion profiling script in `scripts/profile_conversion.py`
+- Added lookup-table caching for common Jalali/Gregorian ranges and wired it into vectorized conversion paths
+- Reviewed Cython for hot paths and deferred to a future optimization phase
 
 ---
 
