@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from jalali_pandas import JalaliDatetimeIndex, JalaliTimestamp
+from jalali_pandas import JalaliDatetimeIndex, JalaliMonthEnd, JalaliTimestamp
 from jalali_pandas.core.arrays import JalaliDatetimeArray
 
 
@@ -73,6 +73,28 @@ class TestJalaliDatetimeIndexConstruction:
 
         assert len(idx) == 0
 
+    def test_from_none(self):
+        """Test construction from None."""
+        idx = JalaliDatetimeIndex(None)
+        assert len(idx) == 0
+
+    def test_copy_from_index(self):
+        """Test copy behavior when constructing from another index."""
+        idx = JalaliDatetimeIndex(["1402-01-01", "1402-01-02"])
+        copied = JalaliDatetimeIndex(idx, copy=True)
+
+        assert copied.equals(idx)
+        assert copied._data is not idx._data
+
+    def test_copy_from_array(self):
+        """Test copy behavior when constructing from array."""
+        arr = JalaliDatetimeArray._from_sequence(
+            [JalaliTimestamp(1402, 1, 1), JalaliTimestamp(1402, 1, 2)]
+        )
+        idx = JalaliDatetimeIndex(arr, copy=True)
+
+        assert idx._data is not arr
+
 
 class TestJalaliDatetimeIndexProperties:
     """Tests for JalaliDatetimeIndex properties."""
@@ -118,6 +140,31 @@ class TestJalaliDatetimeIndexProperties:
     def test_dtype(self, sample_index):
         """Test dtype property."""
         assert sample_index.dtype.name == "jalali_datetime"
+
+    def test_freq_setter_and_freqstr(self):
+        """Test freq setter and freqstr output."""
+        idx = JalaliDatetimeIndex(["1402-01-01"])
+        idx.freq = "D"
+        assert idx.freqstr == "D"
+
+        idx.freq = JalaliMonthEnd()
+        assert idx.freqstr == str(idx.freq)
+
+    def test_inferred_frequency(self):
+        """Test inferred frequency from data."""
+        daily = JalaliDatetimeIndex(["1402-01-01", "1402-01-02", "1402-01-03"])
+        hourly = JalaliDatetimeIndex(
+            [
+                JalaliTimestamp(1402, 1, 1, 0, 0, 0),
+                JalaliTimestamp(1402, 1, 1, 1, 0, 0),
+                JalaliTimestamp(1402, 1, 1, 2, 0, 0),
+            ]
+        )
+        short = JalaliDatetimeIndex(["1402-01-01", "1402-01-02"])
+
+        assert daily.inferred_freq == "D"
+        assert hourly.inferred_freq == "h"
+        assert short.inferred_freq is None
 
 
 class TestJalaliDatetimeIndexIndexing:
@@ -175,6 +222,44 @@ class TestJalaliDatetimeIndexIndexing:
         """Test get_loc raises KeyError for missing key."""
         with pytest.raises(KeyError):
             sample_index.get_loc("1402-01-10")
+
+    def test_get_loc_with_jalali_timestamp(self, sample_index):
+        """Test get_loc with JalaliTimestamp input."""
+        loc = sample_index.get_loc(JalaliTimestamp(1402, 2, 1))
+        assert loc == 2
+
+    def test_partial_string_not_found(self, sample_index):
+        """Test partial string lookup raises KeyError when no match."""
+        with pytest.raises(KeyError):
+            sample_index.get_loc("1401")
+
+    def test_repr_truncates(self):
+        """Test repr truncates long indexes."""
+        idx = JalaliDatetimeIndex([f"1402-01-{day:02d}" for day in range(1, 8)])
+        repr_str = repr(idx)
+
+        assert "..." in repr_str
+
+    def test_slice_locs(self):
+        """Test slice_locs boundaries."""
+        idx = JalaliDatetimeIndex(
+            ["1402-01-01", "1402-01-05", "1402-01-10", "1402-01-20"]
+        )
+        start, end = idx.slice_locs("1402-01-05", "1402-01-10")
+
+        assert (start, end) == (1, 3)
+
+    def test_parse_to_timestamp_variants(self):
+        """Test parsing keys to JalaliTimestamp."""
+        idx = JalaliDatetimeIndex(["1402-01-01"])
+
+        assert idx._parse_to_timestamp("1402-01-01 01:02:03") == JalaliTimestamp(
+            1402, 1, 1
+        )
+        assert idx._parse_to_timestamp("1402") == JalaliTimestamp(1402, 1, 1)
+        assert idx._parse_to_timestamp("1402-02") == JalaliTimestamp(1402, 2, 1)
+        with pytest.raises(ValueError):
+            idx._parse_to_timestamp("invalid")
 
 
 class TestJalaliDatetimeIndexConversion:
@@ -236,6 +321,43 @@ class TestJalaliDatetimeIndexSetOperations:
         assert JalaliTimestamp(1402, 1, 3) in result
         assert JalaliTimestamp(1402, 1, 2) not in result
 
+    def test_union_with_nat(self):
+        """Test union with NaT values."""
+        idx1 = JalaliDatetimeIndex([JalaliTimestamp(1402, 1, 1), pd.NaT])
+        idx2 = JalaliDatetimeIndex([JalaliTimestamp(1402, 1, 2), pd.NaT])
+
+        result = idx1.union(idx2)
+        assert len(result) == 3
+        assert any(pd.isna(val) for val in result)
+
+    def test_intersection_with_nat(self):
+        """Test intersection with NaT values."""
+        idx1 = JalaliDatetimeIndex([JalaliTimestamp(1402, 1, 1), pd.NaT])
+        idx2 = JalaliDatetimeIndex([pd.NaT])
+
+        result = idx1.intersection(idx2)
+        assert len(result) == 1
+        assert pd.isna(result[0])
+
+    def test_difference_with_nat(self):
+        """Test difference with NaT values."""
+        idx1 = JalaliDatetimeIndex([JalaliTimestamp(1402, 1, 1), pd.NaT])
+        idx2 = JalaliDatetimeIndex([pd.NaT])
+
+        result = idx1.difference(idx2)
+        assert len(result) == 1
+        assert result[0] == JalaliTimestamp(1402, 1, 1)
+
+    def test_set_ops_type_error(self):
+        """Test set operations reject non-index inputs."""
+        idx = JalaliDatetimeIndex(["1402-01-01"])
+        with pytest.raises(TypeError, match="JalaliDatetimeIndex"):
+            idx.union(["1402-01-02"])  # type: ignore[arg-type]
+        with pytest.raises(TypeError, match="JalaliDatetimeIndex"):
+            idx.intersection(["1402-01-02"])  # type: ignore[arg-type]
+        with pytest.raises(TypeError, match="JalaliDatetimeIndex"):
+            idx.difference(["1402-01-02"])  # type: ignore[arg-type]
+
 
 class TestJalaliDatetimeIndexShift:
     """Tests for JalaliDatetimeIndex shift operations."""
@@ -258,6 +380,38 @@ class TestJalaliDatetimeIndexShift:
         # After shifting by 1 month end
         assert shifted[0].month == 2 or shifted[0].month == 1
         assert shifted[1].month == 3 or shifted[1].month == 2
+
+    def test_shift_requires_freq(self):
+        """Test shift raises when freq is missing."""
+        idx = JalaliDatetimeIndex(["1402-01-01", "1402-01-02"])
+        with pytest.raises(ValueError, match="freq must be specified"):
+            idx.shift()
+
+    def test_shift_with_string_offset(self):
+        """Test shift with string frequency parsed as Timedelta."""
+        idx = JalaliDatetimeIndex(["1402-01-01", "1402-01-02"])
+        shifted = idx.shift(2, freq="2D")
+
+        assert shifted[0] == JalaliTimestamp(1402, 1, 5)
+
+    def test_shift_with_jalali_alias(self):
+        """Test shift with Jalali frequency alias string."""
+        idx = JalaliDatetimeIndex(["1402-01-01"], freq="JME")
+        shifted = idx.shift(1, freq="JME")
+
+        assert shifted[0].is_month_end
+
+    def test_snap(self):
+        """Test snap to nearest minute."""
+        idx = JalaliDatetimeIndex(
+            [
+                JalaliTimestamp(1402, 1, 1, 12, 0, 30),
+                JalaliTimestamp(1402, 1, 1, 12, 1, 0),
+            ]
+        )
+        snapped = idx.snap("min")
+
+        assert snapped[0] == idx[0]
 
 
 class TestJalaliDatetimeIndexMisc:
@@ -330,3 +484,27 @@ class TestJalaliDatetimeIndexMisc:
 
         assert isinstance(values, JalaliDatetimeArray)
         assert len(values) == 2
+
+    def test_shallow_copy(self):
+        """Test _shallow_copy uses existing values when none provided."""
+        idx = JalaliDatetimeIndex(["1402-01-01", "1402-01-02"])
+        copied = idx._shallow_copy()
+
+        assert copied is not idx
+        assert copied.equals(idx)
+
+    def test_eq_with_timestamp(self):
+        """Test element-wise equality with JalaliTimestamp."""
+        idx = JalaliDatetimeIndex(["1402-01-01", "1402-01-02"])
+        mask = idx == JalaliTimestamp(1402, 1, 2)
+
+        assert mask.tolist() == [False, True]
+
+    def test_to_numpy(self):
+        """Test to_numpy with and without dtype."""
+        idx = JalaliDatetimeIndex(["1402-01-01", "1402-01-02"])
+        raw = idx.to_numpy()
+        typed = idx.to_numpy(dtype=object)
+
+        assert len(raw) == 2
+        assert typed.dtype == object
