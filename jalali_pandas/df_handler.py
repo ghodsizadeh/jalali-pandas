@@ -131,10 +131,34 @@ class JalaliDataframeAccessor:
     def resample(self, resample_type: str) -> pd.DataFrame:
         """Resample by Jalali frequency.
 
-        Args:
-            resample_type: The resample frequency.
+        Groups the DataFrame by Jalali calendar periods and aggregates.
 
-        Raises:
-            NotImplementedError: This method is not yet implemented.
+        Args:
+            resample_type: The resample frequency. Options:
+                - 'month': Group by Jalali month
+                - 'quarter': Group by Jalali quarter
+                - 'year': Group by Jalali year
+
+        Returns:
+            DataFrame with aggregated values grouped by the specified period.
+
+        Examples:
+            >>> df.jalali.resample('month')
+            >>> df.jalali.resample('quarter')
         """
-        raise NotImplementedError
+        valid_types = ["month", "quarter", "year"]
+        if resample_type not in valid_types:
+            raise ValueError(
+                f"{resample_type} is not a valid resample type. "
+                f"Choose from {valid_types}"
+            )
+
+        # Map resample type to groupby key
+        type_to_groupby: dict[str, str] = {
+            "month": "ym",
+            "quarter": "yq",
+            "year": "year",
+        }
+
+        groupby_key = type_to_groupby[resample_type]
+        return self.groupby(groupby_key).sum(numeric_only=True).reset_index(drop=True)
