@@ -268,6 +268,57 @@ class TestJalaliGrouper:
         assert grouped.min(numeric_only=True) is not None
         assert grouped.max(numeric_only=True) is not None
 
+    def test_grouper_without_key_uses_index(self):
+        """Test grouper falls back to DatetimeIndex."""
+        from jalali_pandas.api.grouper import JalaliGrouper
+
+        idx = pd.date_range("2023-03-21", periods=5, freq="D")
+        series = pd.Series(range(5), index=idx)
+        grouper = JalaliGrouper(freq="JME")
+
+        groups = grouper.get_grouper(series)
+        assert len(groups) == len(series)
+
+    def test_grouper_requires_key_or_datetime_index(self):
+        """Test grouper raises when no key or DatetimeIndex is present."""
+        from jalali_pandas.api.grouper import JalaliGrouper
+
+        series = pd.Series(range(3))
+        grouper = JalaliGrouper(freq="JME")
+
+        with pytest.raises(ValueError, match="requires either"):
+            _ = grouper.get_grouper(series)
+
+    def test_grouper_handles_jalali_values(self):
+        """Test grouper handles JalaliTimestamp values directly."""
+        from jalali_pandas.api.grouper import JalaliGrouper
+        from jalali_pandas.core.timestamp import JalaliTimestamp
+
+        series = pd.Series([JalaliTimestamp(1402, 1, 1)])
+        grouper = JalaliGrouper(freq="INVALID")
+
+        groups = grouper._compute_jalali_groups(series)
+        assert groups.iloc[0] == pd.Timestamp("2023-03-21")
+
+
+class TestJalaliResamplerInternals:
+    """Tests for JalaliResampler internal behaviors."""
+
+    def test_resampler_apply_agg(self):
+        """Test internal aggregation helper."""
+        idx = pd.date_range("2023-03-21", periods=10, freq="D")
+        series = pd.Series(range(10), index=idx)
+
+        resampler = resample_jalali(series, "JME")
+        result = resampler._apply_agg("sum")
+        assert result.sum() == 45
+
+    def test_resampler_requires_datetime_index(self):
+        """Test resampler raises for non-datetime index."""
+        series = pd.Series(range(3))
+        with pytest.raises(ValueError, match="DatetimeIndex"):
+            _ = resample_jalali(series, "JME")
+
 
 class TestDataFrameAccessorResample:
     """Tests for DataFrame accessor resample method."""

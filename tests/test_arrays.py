@@ -40,6 +40,28 @@ class TestJalaliDatetimeArrayCreation:
         assert arr[0].month == 1
         assert arr[0].day == 1
 
+    def test_from_sequence_with_time_string(self):
+        """Test creating array from datetime strings with time."""
+        arr = JalaliDatetimeArray._from_sequence(["1402-01-01 10:30:00"])
+        assert arr[0].day == 1
+        assert arr[0].hour == 0
+
+    def test_from_sequence_with_invalid_string(self):
+        """Test invalid string values become NaT."""
+        arr = JalaliDatetimeArray._from_sequence(["invalid-date"])
+        assert pd.isna(arr[0])
+
+    def test_from_sequence_with_unknown_type(self):
+        """Test unknown value types become NaT."""
+        arr = JalaliDatetimeArray._from_sequence([123])
+        assert pd.isna(arr[0])
+
+    def test_init_copy(self):
+        """Test constructor copy behavior."""
+        data = np.array([JalaliTimestamp(1402, 1, 1)], dtype=object)
+        arr = JalaliDatetimeArray(data, copy=True)
+        assert arr._data is not data
+
     def test_from_sequence_with_timestamps(self):
         """Test creating array from pandas Timestamps."""
         ts = pd.Timestamp("2023-03-21")
