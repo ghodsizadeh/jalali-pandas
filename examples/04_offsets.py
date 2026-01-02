@@ -6,12 +6,15 @@ for date arithmetic that respects Jalali calendar boundaries.
 
 from jalali_pandas import JalaliTimestamp
 from jalali_pandas.offsets import (
+    FRIDAY,
     JalaliMonthBegin,
     JalaliMonthEnd,
     JalaliQuarterBegin,
     JalaliQuarterEnd,
+    JalaliWeek,
     JalaliYearBegin,
     JalaliYearEnd,
+    parse_jalali_frequency,
 )
 
 # =============================================================================
@@ -156,6 +159,52 @@ print(f"Negated: {negated}")
 ts = JalaliTimestamp(1402, 6, 15)
 result = ts + negated
 print(f"{ts} + negated offset = {result}")
+
+# =============================================================================
+# Week Offsets
+# =============================================================================
+
+print("\n" + "=" * 60)
+print("Week Offsets")
+print("=" * 60)
+
+ts = JalaliTimestamp(1402, 6, 15)
+print(f"Starting date: {ts} (weekday={ts.dayofweek})")
+
+# Week offset (default: Saturday)
+week = JalaliWeek()
+result = ts + week
+print(f"+ JalaliWeek(): {result} (weekday={result.dayofweek})")
+
+# Week offset with custom weekday (Friday)
+week_fri = JalaliWeek(weekday=FRIDAY)
+result = ts + week_fri
+print(f"+ JalaliWeek(weekday=FRIDAY): {result} (weekday={result.dayofweek})")
+
+# Multiple weeks
+result = ts + JalaliWeek(n=2)
+print(f"+ JalaliWeek(n=2): {result}")
+
+# =============================================================================
+# Frequency Aliases
+# =============================================================================
+
+print("\n" + "=" * 60)
+print("Frequency Aliases")
+print("=" * 60)
+
+# Parse frequency strings
+parsed_offset = parse_jalali_frequency("JME")
+print(f"parse_jalali_frequency('JME'): {parsed_offset}")
+
+parsed_offset = parse_jalali_frequency("2JQE")
+print(f"parse_jalali_frequency('2JQE'): {parsed_offset}")
+
+parsed_offset = parse_jalali_frequency("-1JYS")
+print(f"parse_jalali_frequency('-1JYS'): {parsed_offset}")
+
+parsed_offset = parse_jalali_frequency("JW")
+print(f"parse_jalali_frequency('JW'): {parsed_offset}")
 
 print("\n" + "=" * 60)
 print("Examples completed successfully!")
