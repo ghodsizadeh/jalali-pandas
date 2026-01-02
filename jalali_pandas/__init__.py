@@ -6,6 +6,13 @@ for pandas, including custom dtypes, timestamps, and time series operations.
 """
 
 from jalali_pandas._version import __version__
+
+# API functions
+from jalali_pandas.api import (
+    jalali_date_range,
+    to_gregorian_datetime,
+    to_jalali_datetime,
+)
 from jalali_pandas.core.arrays import JalaliDatetimeArray
 
 # Calendar utilities
@@ -15,6 +22,9 @@ from jalali_pandas.core.calendar import (
     is_leap_year,
 )
 from jalali_pandas.core.dtypes import JalaliDatetimeDtype
+
+# Index
+from jalali_pandas.core.indexes import JalaliDatetimeIndex
 
 # Core types
 from jalali_pandas.core.timestamp import JalaliTimestamp
@@ -41,6 +51,11 @@ __all__ = [
     "JalaliTimestamp",
     "JalaliDatetimeDtype",
     "JalaliDatetimeArray",
+    "JalaliDatetimeIndex",
+    # API functions
+    "jalali_date_range",
+    "to_jalali_datetime",
+    "to_gregorian_datetime",
     # Calendar utilities
     "is_leap_year",
     "days_in_month",
