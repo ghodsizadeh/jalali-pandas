@@ -457,6 +457,53 @@ This document outlines the phased implementation plan for building full Jalali c
 
 ---
 
+## Phase 8: Automated Release & Documentation Pipeline (Week 19)
+
+### Goals
+- Automate build and publication to PyPI/TestPyPI with provenance and integrity checks
+- Automate documentation build/versioning on release
+- Provide a single release checklist that keeps code, docs, and packages in sync
+
+### Tasks
+
+#### 8.1 Packaging & Publishing Automation
+- [ ] Add a `scripts/release/build.py` helper (or `scripts/release.sh`) to encapsulate version bumping, artifact cleanup, and `uv run python -m build` for sdist/wheel generation.
+- [ ] Wire a GitHub Actions workflow (`.github/workflows/release.yml`) that triggers on tags `v*` and:
+  - [ ] Checks out with `fetch-depth: 0` for tag detection.
+  - [ ] Sets up Python/uv, caches build artifacts, and pins `build`, `twine`, `ruff`, `pytest`, and `mkdocs` versions.
+  - [ ] Runs lint (`uv run ruff check`), format check, full test suite, and type checks before building artifacts.
+  - [ ] Builds sdist/wheel with `uv run python -m build` and runs `uv run twine check dist/*`.
+  - [ ] Publishes to TestPyPI on prerelease tags (e.g., `v1.0.0-rc.1`) and to PyPI on stable tags using OIDC/Trusted Publisher.
+  - [ ] Uploads build logs and artifacts as workflow artifacts for traceability.
+- [ ] Add a dry-run path (manual workflow_dispatch input) to test the pipeline without publishing.
+- [ ] Document environment secrets (PyPI Trusted Publisher or API token fallback) and required repository permissions.
+
+#### 8.2 Versioning & Changelog Management
+- [ ] Introduce a version source of truth (e.g., `jalali_pandas/__init__.py` + `pyproject.toml` sync) and a `scripts/release/bump_version.py` utility to update both locations consistently.
+- [ ] Adopt Keep a Changelog format in `CHANGELOG.md` with “Unreleased” and release sections; add release automation to move entries during tagging.
+- [ ] Configure Release Drafter (or equivalent) to pre-fill GitHub release notes from merged PRs/labels.
+- [ ] Gate the release workflow on a “release approval” check to ensure changelog and version bumps are reviewed.
+
+#### 8.3 Documentation Automation
+- [ ] Add a docs workflow (`.github/workflows/docs.yml`) that builds MkDocs with `uv run mkdocs build --strict` on PRs and publishes to GitHub Pages on tag pushes.
+- [ ] Add a version switcher plugin or static version selector to host multiple docs versions (latest + released) with artifacts published to `gh-pages` under `/latest/` and `/vX.Y.Z/`.
+- [ ] Automate API reference generation (e.g., `mkdocs-gen-files` + `mkdocstrings`) inside the docs workflow and cache results to speed builds.
+- [ ] Ensure examples/notebooks are executed (or at least validated) in CI to prevent stale content.
+
+#### 8.4 Release Checklist (Human-in-the-loop)
+- [ ] Verify changelog completeness and bump versions.
+- [ ] Run `uv run pytest` and `uv run ruff check` locally; ensure docs build succeeds.
+- [ ] Create a signed tag (`git tag -s vX.Y.Z`) and push tags.
+- [ ] Let the release workflow build and publish artifacts; confirm TestPyPI/PyPI uploads.
+- [ ] After publish, confirm docs deployment and update announcement links.
+
+### Deliverables
+- Reproducible, automated PyPI/TestPyPI publishing pipeline
+- Automated docs build/deploy with versioned sites
+- Single release checklist tying together package, docs, and announcements
+
+---
+
 ## Timeline Summary
 
 | Phase | Duration | Focus |
