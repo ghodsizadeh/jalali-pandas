@@ -116,6 +116,15 @@ mean = df.jalali.groupby(['year','quarter'])
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/PYS4Hxmzbyg/0.jpg)](https://www.youtube.com/watch?v=PYS4Hxmzbyg)
 
+## Release automation
+
+- Use `scripts/release/bump_version.py` to sync versions in `pyproject.toml` and
+  `jalali_pandas/_version.py`.
+- Finalize changelog entries with `scripts/release/changelog.py <version>`.
+- Build and validate artifacts with `scripts/release/build.py`.
+- Tag releases as `vX.Y.Z` to trigger publishing pipelines and versioned docs on
+  GitHub Pages.
+
 ## ToDos:
 
 - [x] add gregorian to Jalali Conversion

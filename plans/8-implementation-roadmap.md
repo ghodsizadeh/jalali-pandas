@@ -10,6 +10,9 @@ This document outlines the phased implementation plan for building full Jalali c
 
 **Test Coverage: 94%** (Target: 90%+)
 
+**Release Automation:** Workflows and scripts added for trusted publishing,
+versioning, and versioned documentation.
+
 ### Phase 0: Foundation - ✅ COMPLETE
 - All infrastructure tasks completed
 - Calendar rules module with comprehensive tests

@@ -10,6 +10,8 @@ theme:
     - navigation.tabs
     - navigation.sections
     - toc.integrate
+    - content.action.edit
+    - content.code.copy
   icon:
     repo: fontawesome/brands/github
 
@@ -19,8 +21,20 @@ extra_css:
 extra_javascript:
   - assets/rtl.js
 
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ghodsizadeh/jalali-pandas
+      name: GitHub
+
 plugins:
   - search
+  - gen-files:
+      scripts:
+        - docs/scripts/gen_api.py
+  - mike
   - mkdocstrings:
       handlers:
         python:
@@ -70,6 +84,7 @@ nav:
       - Offsets: en/api/offsets.md
       - Accessors: en/api/accessors.md
   - Contributing: en/contributing.md
+  - Release Checklist: en/release-checklist.md
   - Changelog: en/changelog.md
   - Deployment: en/deployment.md
   - فارسی:

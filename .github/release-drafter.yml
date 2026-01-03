@@ -1,0 +1,21 @@
+template: |
+  ## Changes
+  $CHANGES
+
+name-template: "v$RESOLVED_VERSION"
+prerelease: true
+
+categories:
+  - title: "🚀 Features"
+    labels:
+      - enhancement
+  - title: "🧰 Maintenance"
+    labels:
+      - chore
+      - documentation
+      - dependencies
+  - title: "🐛 Fixes"
+    labels:
+      - bug
+
+change-template: "- $TITLE (#$NUMBER) by @$AUTHOR"

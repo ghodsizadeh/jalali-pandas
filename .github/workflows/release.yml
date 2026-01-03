@@ -1,0 +1,121 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run checks without publishing"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --all-extras --frozen
+
+      - name: Run quality checks
+        run: |
+          set -euo pipefail
+          mkdir -p logs
+          uv run ruff check . | tee logs/ruff.txt
+          uv run ruff format --check . | tee logs/format.txt
+          uv run pytest | tee logs/pytest.txt
+          uv run mypy jalali_pandas | tee logs/mypy.txt
+          uv run pyright jalali_pandas | tee logs/pyright.txt
+          uv run python -m compileall examples | tee logs/examples.txt
+          uv run mkdocs build --strict | tee logs/docs.txt
+
+      - name: Build artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p logs
+          uv run python scripts/release/build.py | tee logs/build.txt
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-logs
+          path: logs
+
+  publish:
+    needs: checks
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.inputs.dry_run == 'false'
+    environment:
+      name: release
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Determine target repository
+        id: target
+        run: |
+          ref_name="${GITHUB_REF_NAME:-manual}"
+          version_no_prefix="${ref_name#v}"
+          if [[ "$version_no_prefix" =~ [a-zA-Z] ]]; then
+            echo "repository_url=https://test.pypi.org/legacy/" >> "$GITHUB_OUTPUT"
+            echo "target=TestPyPI" >> "$GITHUB_OUTPUT"
+          else
+            echo "repository_url=" >> "$GITHUB_OUTPUT"
+            echo "target=PyPI" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish package
+        if: steps.target.outputs.target == 'PyPI'
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Publish prerelease to TestPyPI
+        if: steps.target.outputs.target == 'TestPyPI'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: ${{ steps.target.outputs.repository_url }}
+
+      - name: Upload publish logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-logs
+          path: dist

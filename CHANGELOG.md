@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Release tooling for version bumps, changelog finalization, and builds
+- GitHub Actions workflows for releases, docs versioning, and release drafts
+- Versioned documentation publishing with Mike and MkDocs API generation
+
 ## [1.0.0a1] - 2026-01-01
 
 ### Added
