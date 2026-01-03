@@ -1,0 +1,14 @@
+body[data-md-page-path^="fa/"] {
+  direction: rtl;
+  font-family: "Tahoma", "Arial", sans-serif;
+}
+
+body[data-md-page-path^="fa/"] .md-typeset code,
+body[data-md-page-path^="fa/"] .md-typeset pre {
+  direction: ltr;
+  unicode-bidi: bidi-override;
+}
+
+body[data-md-page-path^="fa/"] .md-typeset table {
+  direction: rtl;
+}

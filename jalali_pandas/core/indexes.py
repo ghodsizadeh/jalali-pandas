@@ -27,14 +27,6 @@ class JalaliDatetimeIndex(Index):
     A JalaliDatetimeIndex is an immutable array of Jalali timestamps,
     suitable for use as an index in pandas DataFrames and Series.
 
-    Parameters:
-        data: Array-like of JalaliTimestamp, strings, or None.
-        freq: Frequency string or JalaliOffset.
-        tz: Timezone.
-        dtype: JalaliDatetimeDtype instance.
-        copy: Whether to copy the data.
-        name: Name of the index.
-
     Examples:
         >>> idx = JalaliDatetimeIndex(["1402-01-01", "1402-01-02", "1402-01-03"])
         >>> idx

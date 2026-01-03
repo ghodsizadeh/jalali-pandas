@@ -1,0 +1,103 @@
+site_name: jalali_pandas
+site_url: https://ghodsizadeh.github.io/jalali-pandas/
+repo_url: https://github.com/ghodsizadeh/jalali-pandas
+repo_name: ghodsizadeh/jalali-pandas
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - assets/extra.css
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_signature_annotations: true
+            separate_signature: true
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed
+  - pymdownx.details
+  - pymdownx.emoji
+
+nav:
+  - Home: en/index.md
+  - Installation: en/installation.md
+  - Quickstart: en/quickstart.md
+  - User Guide:
+      - Core Types: en/user-guide/core-types.md
+      - Conversion: en/user-guide/conversion.md
+      - Index & Range: en/user-guide/index-range.md
+      - Frequency Offsets: en/user-guide/frequency-offsets.md
+      - Time Series Ops: en/user-guide/time-series.md
+      - Accessors: en/user-guide/accessors.md
+      - Timezones: en/user-guide/timezones.md
+      - NaT Handling: en/user-guide/nat-handling.md
+      - Limitations: en/user-guide/limitations.md
+  - Examples:
+      - Overview: en/examples/index.md
+      - Basic Usage: en/examples/basic-usage.md
+      - Series Operations: en/examples/series-operations.md
+      - DataFrame Operations: en/examples/dataframe-operations.md
+      - Offsets: en/examples/offsets.md
+      - Index & Date Range: en/examples/index-and-date-range.md
+      - Notebooks: en/examples/notebooks.md
+  - Benchmarks: en/benchmarks.md
+  - API Reference:
+      - Overview: en/api/index.md
+      - Core: en/api/core.md
+      - API: en/api/api.md
+      - Offsets: en/api/offsets.md
+      - Accessors: en/api/accessors.md
+  - Contributing: en/contributing.md
+  - Changelog: en/changelog.md
+  - Deployment: en/deployment.md
+  - فارسی:
+      - خانه: fa/index.md
+      - نصب: fa/installation.md
+      - شروع سریع: fa/quickstart.md
+      - راهنمای کاربر:
+          - انواع اصلی: fa/user-guide/core-types.md
+          - تبدیل‌ها: fa/user-guide/conversion.md
+          - ایندکس و بازه: fa/user-guide/index-range.md
+          - افست‌ها: fa/user-guide/frequency-offsets.md
+          - عملیات سری زمانی: fa/user-guide/time-series.md
+          - اکسسورها: fa/user-guide/accessors.md
+          - منطقه‌های زمانی: fa/user-guide/timezones.md
+          - NaT: fa/user-guide/nat-handling.md
+          - محدودیت‌ها: fa/user-guide/limitations.md
+      - مثال‌ها:
+          - نمای کلی: fa/examples/index.md
+          - استفاده پایه: fa/examples/basic-usage.md
+          - عملیات سری: fa/examples/series-operations.md
+          - عملیات دیتافریم: fa/examples/dataframe-operations.md
+          - افست‌ها: fa/examples/offsets.md
+          - ایندکس و بازه تاریخ: fa/examples/index-and-date-range.md
+          - نوت‌بوک‌ها: fa/examples/notebooks.md
+      - بنچمارک: fa/benchmarks.md
+      - مرجع API:
+          - نمای کلی: fa/api/index.md
+          - هسته: fa/api/core.md
+          - API: fa/api/api.md
+          - افست‌ها: fa/api/offsets.md
+          - اکسسورها: fa/api/accessors.md
+      - مشارکت: fa/contributing.md
+      - تغییرات: fa/changelog.md
+      - انتشار: fa/deployment.md
