@@ -1,14 +1,34 @@
-name: Python package
+name: Publish to PyPI
+
 on:
   push:
     tags:
       - "v*.*.*"
+
+permissions:
+  id-token: write
+
 jobs:
-  build:
+  publish:
+    name: Publish to PyPI
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Build and publish to pypi
-        uses: JRubics/poetry-publish@v1.10
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          pypi_token: ${{ secrets.PYPI_TOKEN }}
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install build dependencies
+        run: uv pip install build
+
+      - name: Build package
+        run: uv run -- python -m build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
