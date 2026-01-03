@@ -4,8 +4,8 @@
 
 - `JalaliDataFrameAccessor` نیاز به حداقل یک ستون `jdatetime` دارد.
 - `JalaliResampler` فقط با `pd.DatetimeIndex` کار می‌کند.
-- `jalali_date_range` باید دقیقاً دو مورد از `start`, `end`, `periods` را داشته
-  باشد.
+- `jalali_date_range` باید حداقل دو مورد از `start`, `end`, `periods` را داشته
+  باشد؛ اگر هر سه مقدار داده شود، `freq` اجباری است.
 - `to_jalali_datetime` فقط چند فرمت مشخص را بدون `format` پشتیبانی می‌کند.
 - `JalaliDatetimeArray` از آرایه object استفاده می‌کند و ممکن است کندتر باشد.
 

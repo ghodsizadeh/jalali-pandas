@@ -110,6 +110,7 @@ def _register_default_aliases() -> None:
     """
     from jalali_pandas.offsets.month import JalaliMonthBegin, JalaliMonthEnd
     from jalali_pandas.offsets.quarter import JalaliQuarterBegin, JalaliQuarterEnd
+    from jalali_pandas.offsets.week import JalaliWeek
     from jalali_pandas.offsets.year import JalaliYearBegin, JalaliYearEnd
 
     # Month offsets
@@ -123,6 +124,9 @@ def _register_default_aliases() -> None:
     # Year offsets
     register_jalali_alias("JYE", JalaliYearEnd)
     register_jalali_alias("JYS", JalaliYearBegin)
+
+    # Week offsets
+    register_jalali_alias("JW", JalaliWeek)
 
 
 # Register default aliases on module import

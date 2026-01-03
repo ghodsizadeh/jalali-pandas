@@ -1,8 +1,21 @@
 # Time Series Operations
 
+## Overview
+
+There are two main workflows:
+
+1. **Gregorian timestamps/indexes** → use `JalaliGrouper`, `jalali_groupby`,
+   or `resample_jalali`.
+2. **Jalali `jdatetime` columns** → use the DataFrame accessor
+   (`df.jalali.groupby(...)`, `df.jalali.resample(...)`).
+
+`JalaliGrouper` and `resample_jalali` expect Gregorian datetimes. If you have
+`jdatetime` values, convert to Gregorian or use the DataFrame accessor.
+
 ## JalaliGrouper
 
-Use `JalaliGrouper` to create group labels based on Jalali boundaries.
+Use `JalaliGrouper` to create group labels based on Jalali boundaries. The
+labels are Gregorian `pd.Timestamp` values.
 
 ```python
 import pandas as pd
@@ -39,10 +52,10 @@ resampled = resample_jalali(series, freq="JME").sum()
 
 ## DataFrame accessor resample
 
-`JalaliDataFrameAccessor.resample()` supports month/quarter/year grouping for
-DataFrames that contain a jdatetime column.
+`JalaliDataFrameAccessor.resample()` supports month/quarter/year/weekly
+grouping for DataFrames that contain a `jdatetime` column.
 
 ```python
 df["jdate"] = df["date"].jalali.to_jalali()
-df.jalali.resample("month")
+monthly = df.jalali.resample("month")
 ```

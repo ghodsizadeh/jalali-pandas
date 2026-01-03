@@ -3,12 +3,21 @@ body[data-md-page-path^="fa/"] {
   font-family: "Tahoma", "Arial", sans-serif;
 }
 
+body[data-md-page-path^="fa/"] .md-typeset {
+  text-align: right;
+}
+
 body[data-md-page-path^="fa/"] .md-typeset code,
 body[data-md-page-path^="fa/"] .md-typeset pre {
   direction: ltr;
+  text-align: left;
   unicode-bidi: bidi-override;
 }
 
 body[data-md-page-path^="fa/"] .md-typeset table {
   direction: rtl;
+}
+
+body[data-md-page-path^="fa/"] .md-nav__link {
+  text-align: right;
 }

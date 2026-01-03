@@ -1,14 +1,14 @@
 # افست‌های فرکانسی
 
-افست‌های جلالی مشابه DateOffset های pandas هستند اما قواعد تقویم جلالی را رعایت
-می‌کنند.
+افست‌های جلالی شبیه DateOffset‌های pandas هستند اما قواعد تقویم جلالی را رعایت
+می‌کنند (طول ماه‌ها، سال کبیسه، فصل‌ها و مرز هفته).
 
 ## کلاس‌ها
 
 - `JalaliMonthBegin`, `JalaliMonthEnd`
 - `JalaliQuarterBegin`, `JalaliQuarterEnd`
 - `JalaliYearBegin`, `JalaliYearEnd`
-- `JalaliWeek` (با هفته دلخواه)
+- `JalaliWeek` (افست هفتگی با امکان تعیین روز هفته)
 
 ```python
 from jalali_pandas import JalaliTimestamp
@@ -19,18 +19,20 @@ print(ts + JalaliMonthEnd())
 print(ts + JalaliWeek(weekday=FRIDAY))
 ```
 
-## alias ها
+## نام‌های مستعار فرکانس
 
 - JME / JMS
 - JQE / JQS
 - JYE / JYS
-- JW
+- JW (هفتگی، پیش‌فرض شنبه)
 
 ```python
 from jalali_pandas.offsets import parse_jalali_frequency, list_jalali_aliases
 
 parse_jalali_frequency("JME")
+parse_jalali_frequency("JW")  # پیش‌فرض شنبه
 list_jalali_aliases()
 ```
 
-با `register_jalali_alias` می‌توانید alias جدید ثبت کنید.
+برای تعیین روز هفته خاص از `JalaliWeek(weekday=...)` استفاده کنید. با
+`register_jalali_alias` می‌توانید نام مستعار جدید ثبت کنید.
