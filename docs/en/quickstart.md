@@ -46,4 +46,4 @@ df["jdate"] = df["date"].jalali.to_jalali()
 result = df.jalali.groupby("year").sum(numeric_only=True)
 ```
 
-Next: go deeper in `en/user-guide/core-types.md`.
+Next: go deeper in [Core types](user-guide/core-types.md).

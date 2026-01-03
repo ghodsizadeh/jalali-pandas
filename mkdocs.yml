@@ -16,6 +16,9 @@ theme:
 extra_css:
   - assets/extra.css
 
+extra_javascript:
+  - assets/rtl.js
+
 plugins:
   - search
   - mkdocstrings:
@@ -38,7 +41,7 @@ markdown_extensions:
   - pymdownx.emoji
 
 nav:
-  - Home: en/index.md
+  - Home: index.md
   - Installation: en/installation.md
   - Quickstart: en/quickstart.md
   - User Guide:

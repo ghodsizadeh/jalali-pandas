@@ -1,23 +1,25 @@
-body[data-md-page-path^="fa/"] {
+html[dir="rtl"] body {
   direction: rtl;
   font-family: "Tahoma", "Arial", sans-serif;
 }
 
-body[data-md-page-path^="fa/"] .md-typeset {
+html[dir="rtl"] .md-typeset {
   text-align: right;
 }
 
-body[data-md-page-path^="fa/"] .md-typeset code,
-body[data-md-page-path^="fa/"] .md-typeset pre {
+html[dir="rtl"] .md-typeset code,
+html[dir="rtl"] .md-typeset pre {
   direction: ltr;
   text-align: left;
   unicode-bidi: bidi-override;
 }
 
-body[data-md-page-path^="fa/"] .md-typeset table {
+html[dir="rtl"] .md-typeset table {
   direction: rtl;
 }
 
-body[data-md-page-path^="fa/"] .md-nav__link {
+html[dir="rtl"] .md-nav__link,
+html[dir="rtl"] .md-search__input,
+html[dir="rtl"] .md-header__title {
   text-align: right;
 }

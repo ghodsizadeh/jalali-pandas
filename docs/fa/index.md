@@ -26,7 +26,7 @@ idx = jp.jalali_date_range("1402-01-01", periods=3, freq="D")
 
 ## مسیر بعدی
 
-- نصب: `fa/installation.md`
-- شروع سریع: `fa/quickstart.md`
-- راهنمای کاربر: `fa/user-guide/core-types.md`
-- مثال‌ها: `fa/examples/index.md`
+- نصب: [نصب](installation.md)
+- شروع سریع: [شروع سریع](quickstart.md)
+- راهنمای کاربر: [انواع اصلی](user-guide/core-types.md)
+- مثال‌ها: [نمای کلی مثال‌ها](examples/index.md)

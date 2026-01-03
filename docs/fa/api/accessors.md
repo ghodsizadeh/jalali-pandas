@@ -2,4 +2,4 @@
 
 این بخش در نسخه انگلیسی تولید می‌شود:
 
-- `en/api/accessors.md`
+- [اکسسورها](../../en/api/accessors.md)

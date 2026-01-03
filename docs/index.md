@@ -28,7 +28,7 @@ idx = jp.jalali_date_range("1402-01-01", periods=3, freq="D")
 
 ## Next steps
 
-- Installation: `en/installation.md`
-- Quickstart: `en/quickstart.md`
-- User guide: `en/user-guide/core-types.md`
-- Examples: `en/examples/index.md`
+- Installation: [Installation](en/installation.md)
+- Quickstart: [Quickstart](en/quickstart.md)
+- User guide: [Core types](en/user-guide/core-types.md)
+- Examples: [Examples overview](en/examples/index.md)
