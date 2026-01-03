@@ -23,3 +23,18 @@ html[dir="rtl"] .md-search__input,
 html[dir="rtl"] .md-header__title {
   text-align: right;
 }
+
+html[dir="rtl"] .md-header,
+html[dir="rtl"] .md-tabs,
+html[dir="rtl"] .md-tabs__list,
+html[dir="rtl"] .md-tabs__item,
+html[dir="rtl"] .md-search {
+  direction: ltr;
+}
+
+html[dir="rtl"] .md-header__inner,
+html[dir="rtl"] .md-tabs__list,
+html[dir="rtl"] .md-search__form,
+html[dir="rtl"] .md-search__input {
+  text-align: left;
+}
