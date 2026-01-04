@@ -30,6 +30,10 @@
 
 ## Installation
 
+    uv add jalali-pandas
+
+Or with pip:
+
     pip install -U jalali-pandas
 
 ## Usage

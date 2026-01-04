@@ -392,16 +392,16 @@ print(idx.quarter)   # [1, 1, 1, ..., 4, 4]
 
 ## Installation
 
-=== "pip"
-
-    ```bash
-    pip install jalali-pandas
-    ```
-
 === "uv"
 
     ```bash
     uv add jalali-pandas
+    ```
+
+=== "pip"
+
+    ```bash
+    pip install jalali-pandas
     ```
 
 === "conda"

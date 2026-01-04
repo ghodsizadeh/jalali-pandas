@@ -7,16 +7,16 @@
 - numpy >= 1.23
 - jdatetime >= 4.0
 
+## نصب با uv
+
+```bash
+uv add jalali-pandas
+```
+
 ## نصب با pip
 
 ```bash
 pip install -U jalali-pandas
-```
-
-## نصب با uv
-
-```bash
-uv pip install jalali-pandas
 ```
 
 ## افزونه‌های اختیاری (برای مشارکت)

@@ -526,7 +526,7 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
       - name: Install specific pandas version
-        run: uv pip install pandas==${{ matrix.pandas-version }}.*
+        run: pip install pandas==${{ matrix.pandas-version }}.*
       - name: Run tests
         run: uv run pytest --cov=jalali_pandas --cov-report=xml
       - name: Upload coverage
