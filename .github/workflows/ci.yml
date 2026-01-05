@@ -1,95 +1,114 @@
 name: CI
 
 on:
-    push:
-        branches: [main, dev/v1]
-    pull_request:
-        branches: [main, dev/v1]
+  push:
+    branches: [main, dev/v1]
+  pull_request:
+    branches: [main, dev/v1]
 
 jobs:
-    test:
-        runs-on: ${{ matrix.os }}
-        strategy:
-            fail-fast: false
-            matrix:
-                os: [ubuntu-latest, macos-latest, windows-latest]
-                python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-                pandas-version: ["2.0", "2.1", "2.2"]
-                exclude:
-                    # pandas 2.0 doesn't support Python 3.13
-                    - python-version: "3.13"
-                      pandas-version: "2.0"
-                    # pandas 2.1 doesn't support Python 3.13
-                    - python-version: "3.13"
-                      pandas-version: "2.1"
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        pandas-version: ["2.0", "2.1", "2.2"]
+        exclude:
+          # pandas 2.0 doesn't support Python 3.13
+          - python-version: "3.13"
+            pandas-version: "2.0"
+          # pandas 2.1 doesn't support Python 3.13
+          - python-version: "3.13"
+            pandas-version: "2.1"
 
-        steps:
-            - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v5
-              with:
-                  python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-            - name: Install uv
-              uses: astral-sh/setup-uv@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
 
-            - name: Install dependencies
-              run: |
-                  uv sync --extra dev --frozen
-                  uv pip install "pandas~=${{ matrix.pandas-version }}.0"
+      - name: Install dependencies
+        run: |
+          uv sync --extra dev --frozen
+          uv pip install "pandas~=${{ matrix.pandas-version }}.0"
 
-            - name: Run tests
-              run: uv run pytest --cov=jalali_pandas --cov-report=xml -v
+      - name: Run tests
+        run: uv run pytest --cov=jalali_pandas --cov-report=xml -v
 
-            - name: Upload coverage to Codecov
-              if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' && matrix.pandas-version == '2.2'
-              uses: codecov/codecov-action@v4
-              with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
-                  file: ./coverage.xml
-                  fail_ci_if_error: false
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' && matrix.pandas-version == '2.2'
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          fail_ci_if_error: false
 
-    type-check:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version: "3.11"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-            - name: Install uv
-              uses: astral-sh/setup-uv@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
 
-            - name: Install dependencies
-              run: uv sync --extra dev --frozen
+      - name: Install dependencies
+        run: uv sync --extra dev --frozen
 
-            - name: Run mypy
-              run: uv run mypy jalali_pandas --ignore-missing-imports
+      - name: Run mypy
+        run: uv run mypy jalali_pandas --ignore-missing-imports
 
-            - name: Run pyright
-              run: uv run pyright jalali_pandas
+      - name: Run pyright
+        run: uv run pyright jalali_pandas
 
-    lint:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version: "3.11"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-            - name: Install uv
-              uses: astral-sh/setup-uv@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
 
-            - name: Install dependencies
-              run: uv sync --extra dev --frozen
+      - name: Install dependencies
+        run: uv sync --extra dev --frozen
 
-            - name: Run ruff check
-              run: uv run ruff check jalali_pandas tests
+      - name: Run ruff check
+        run: uv run ruff check jalali_pandas tests
 
-            - name: Run ruff format check
-              run: uv run ruff format --check jalali_pandas tests
+      - name: Run ruff format check
+        run: uv run ruff format --check jalali_pandas tests
+
+  docs-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install docs dependencies
+        run: uv sync --extra docs --frozen
+
+      - name: Build docs
+        run: uv run mkdocs build --strict
