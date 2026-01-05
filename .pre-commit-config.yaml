@@ -22,5 +22,5 @@ repos:
         additional_dependencies:
           - pandas-stubs
           - numpy
-        exclude: ^tests/
+        exclude: ^(tests/|examples/)
         args: [--ignore-missing-imports]

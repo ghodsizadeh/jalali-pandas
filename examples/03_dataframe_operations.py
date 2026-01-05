@@ -99,7 +99,7 @@ print("\n" + "=" * 60)
 print("Multiple Grouping Keys")
 print("=" * 60)
 
-multi = df.jalali.groupby(["year", "quarter"]).sum(numeric_only=True)
+multi = df.jalali.groupby("yq").sum(numeric_only=True)
 print("Sum by Jalali year and quarter:")
 print(multi)
 
