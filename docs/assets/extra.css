@@ -1,0 +1,40 @@
+html[dir="rtl"] body {
+  direction: rtl;
+  font-family: "Tahoma", "Arial", sans-serif;
+}
+
+html[dir="rtl"] .md-typeset {
+  text-align: right;
+}
+
+html[dir="rtl"] .md-typeset code,
+html[dir="rtl"] .md-typeset pre {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: bidi-override;
+}
+
+html[dir="rtl"] .md-typeset table {
+  direction: rtl;
+}
+
+html[dir="rtl"] .md-nav__link,
+html[dir="rtl"] .md-search__input,
+html[dir="rtl"] .md-header__title {
+  text-align: right;
+}
+
+html[dir="rtl"] .md-header,
+html[dir="rtl"] .md-tabs,
+html[dir="rtl"] .md-tabs__list,
+html[dir="rtl"] .md-tabs__item,
+html[dir="rtl"] .md-search {
+  direction: ltr;
+}
+
+html[dir="rtl"] .md-header__inner,
+html[dir="rtl"] .md-tabs__list,
+html[dir="rtl"] .md-search__form,
+html[dir="rtl"] .md-search__input {
+  text-align: left;
+}
