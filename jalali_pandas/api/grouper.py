@@ -163,7 +163,7 @@ def jalali_groupby(
         >>> jalali_groupby(df, 'date', 'JME').sum()
     """
     grouper = JalaliGrouper(key=key, freq=freq, **kwargs)
-    return df.groupby(grouper)
+    return df.groupby(grouper.get_grouper(df))
 
 
 class JalaliResampler:

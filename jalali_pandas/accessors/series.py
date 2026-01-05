@@ -22,6 +22,7 @@ from jalali_pandas.core.calendar import (
     week_of_year,
     weekday_of_jalali,
 )
+from jalali_pandas.core.timestamp import JalaliTimestamp
 
 
 @pd.api.extensions.register_series_accessor("jalali")
@@ -86,7 +87,7 @@ class JalaliSeriesAccessor:
             self._obj.dropna().iloc[0] if len(self._obj.dropna()) > 0 else None
         )
         if first_valid is not None and not isinstance(
-            first_valid, (str, jdatetime.date, jdatetime.datetime)
+            first_valid, (str, jdatetime.date, jdatetime.datetime, JalaliTimestamp)
         ):
             raise TypeError("pandas series must be jdatetime or string of jdate")
 
@@ -151,14 +152,16 @@ class JalaliSeriesAccessor:
         Returns:
             Series of jdatetime objects.
         """
-        return cast(
-            pd.Series,
-            self._obj.apply(
-                lambda x: jdatetime.datetime.strptime(x, format)
-                if not pd.isna(x)
-                else pd.NaT
-            ),
-        )
+
+        def parse_date(x: Any) -> Any:
+            if pd.isna(x):
+                return pd.NaT
+            try:
+                return jdatetime.datetime.strptime(x, format)
+            except (ValueError, TypeError):
+                return pd.NaT
+
+        return cast(pd.Series, self._obj.apply(parse_date))
 
     # -------------------------------------------------------------------------
     # Basic Properties
@@ -426,6 +429,8 @@ class JalaliSeriesAccessor:
         def format_date(x: Any) -> Any:
             if pd.isna(x):
                 return None
+            if isinstance(x, JalaliTimestamp):
+                return x.strftime(date_format)
             return x.strftime(date_format)
 
         return cast(pd.Series, self._obj.apply(format_date))

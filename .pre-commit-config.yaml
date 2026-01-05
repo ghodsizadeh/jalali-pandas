@@ -13,7 +13,9 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
+        exclude: ^examples/
       - id: ruff-format
+        exclude: ^examples/
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.13.0
@@ -22,5 +24,5 @@ repos:
         additional_dependencies:
           - pandas-stubs
           - numpy
-        exclude: ^tests/
+        exclude: ^(tests/|examples/)
         args: [--ignore-missing-imports]
