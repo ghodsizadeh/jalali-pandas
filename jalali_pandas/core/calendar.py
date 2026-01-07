@@ -229,8 +229,8 @@ def weekday_of_jalali(year: int, month: int, day: int) -> int:
     """
     # Convert to Julian Day Number and calculate weekday
     jdn = jalali_to_jdn(year, month, day)
-    # JDN 0 was a Monday, so we adjust for Saturday start
-    return (jdn + 1) % 7
+    # Adjust for Jalali weekday convention (0=Saturday, 6=Friday)
+    return (jdn + 2) % 7
 
 
 def jalali_to_jdn(year: int, month: int, day: int) -> int:
@@ -255,7 +255,7 @@ def jalali_to_jdn(year: int, month: int, day: int) -> int:
         + ((b * 682 - 110) // 2816)
         + (b - 1) * 365
         + (a // 2820) * 1029983
-        + 1948320
+        + 2121445
     )
     return jdn
 
@@ -271,7 +271,7 @@ def jdn_to_jalali(jdn: int) -> tuple[int, int, int]:
     """
     # Use the inverse of jalali_to_jdn algorithm
     # Based on the 2820-year cycle
-    jdn_offset = jdn - 2121446  # Adjusted epoch
+    jdn_offset = jdn - 2121445  # Epoch matching jalali_to_jdn
 
     cycle_2820 = jdn_offset // 1029983
     day_in_cycle = jdn_offset % 1029983
@@ -280,27 +280,27 @@ def jdn_to_jalali(jdn: int) -> tuple[int, int, int]:
         cycle_2820 -= 1
         day_in_cycle += 1029983
 
-    # Find year within cycle
-    year_in_cycle = 0
-    remaining_days = day_in_cycle
+    # Find year within cycle using binary search approach
+    # For year b within cycle, start of year (day=1, month=1) has offset:
+    # 1 + ((b*682-110)//2816) + (b-1)*365
+    def days_to_year_start(b: int) -> int:
+        return 1 + ((b * 682 - 110) // 2816) + (b - 1) * 365
 
-    # 2820 years = 683 leap years + 2137 normal years
-    # Use approximation then adjust
-    year_in_cycle = (day_in_cycle * 2820) // 1029983
-    if year_in_cycle >= 2820:
-        year_in_cycle = 2819
+    # Binary search for the year
+    lo, hi = 0, 2820
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        if days_to_year_start(mid) <= day_in_cycle:
+            lo = mid
+        else:
+            hi = mid - 1
 
-    # Calculate days up to this year
-    days_to_year = (year_in_cycle * 1029983 + 2816 - 1) // 2820
-    while days_to_year > day_in_cycle:
-        year_in_cycle -= 1
-        days_to_year = (year_in_cycle * 1029983 + 2816 - 1) // 2820
-
-    remaining_days = day_in_cycle - days_to_year
+    year_in_cycle = lo
+    remaining_days = day_in_cycle - days_to_year_start(year_in_cycle)
 
     year = cycle_2820 * 2820 + year_in_cycle + 474
 
-    # Find month and day
+    # Find month and day from remaining_days (0-indexed day within year)
     if remaining_days < 186:  # First 6 months (31 days each)
         month = remaining_days // 31 + 1
         day = remaining_days % 31 + 1
