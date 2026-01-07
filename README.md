@@ -51,6 +51,8 @@
 
 ## 📦 Installation
 
+### Using pip
+
 ```bash
 pip install jalali-pandas
 ```
@@ -63,6 +65,22 @@ pip install jalali-pandas==1.0.0b1
 For development:
 ```bash
 pip install jalali-pandas[dev]
+```
+
+### Using uv (recommended for faster installation)
+
+```bash
+uv add jalali-pandas
+```
+
+For the latest beta with all v1.0 features:
+```bash
+uv add jalali-pandas==1.0.0b1
+```
+
+For development:
+```bash
+uv add --dev jalali-pandas
 ```
 
 ## 🚀 Quick Start
