@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-01-07
+
+### Changed
+- **Official 1.0.0 Release**: Moved from beta to production/stable status
+- Package now marked as Production/Stable in PyPI classifiers
+
+### Notes
+- This is the first stable release of jalali-pandas with full pandas 2.0+ extension API support
+- All features from 1.0.0b1 are now considered stable and production-ready
+- API is now considered stable and will follow semantic versioning
+
 ## [1.0.0b1] - 2026-01-05
 
 ### Added
@@ -60,7 +71,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DataFrame accessor with `groupby()` for Jalali date components
 - Groupby shortcuts: year, month, day, week, ym, yq, ymd, md
 
-[Unreleased]: https://github.com/ghodsizadeh/jalali-pandas/compare/v1.0.0b1...HEAD
+[Unreleased]: https://github.com/ghodsizadeh/jalali-pandas/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/ghodsizadeh/jalali-pandas/compare/v1.0.0b1...v1.0.0
 [1.0.0b1]: https://github.com/ghodsizadeh/jalali-pandas/compare/v1.0.0a1...v1.0.0b1
 [1.0.0a1]: https://github.com/ghodsizadeh/jalali-pandas/compare/v0.2.2...v1.0.0a1
 [0.2.2]: https://github.com/ghodsizadeh/jalali-pandas/releases/tag/v0.2.2
