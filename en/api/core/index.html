@@ -16686,7 +16686,7 @@ suitable for use as an index in pandas DataFrames and Series.</p>
         <span class="o">+</span> <span class="p">((</span><span class="n">b</span> <span class="o">*</span> <span class="mi">682</span> <span class="o">-</span> <span class="mi">110</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2816</span><span class="p">)</span>
         <span class="o">+</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">365</span>
         <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="o">//</span> <span class="mi">2820</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1029983</span>
-        <span class="o">+</span> <span class="mi">1948320</span>
+        <span class="o">+</span> <span class="mi">2121445</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">jdn</span>
 </code></pre></div></td></tr></table></div>
@@ -16832,7 +16832,7 @@ suitable for use as an index in pandas DataFrames and Series.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Use the inverse of jalali_to_jdn algorithm</span>
     <span class="c1"># Based on the 2820-year cycle</span>
-    <span class="n">jdn_offset</span> <span class="o">=</span> <span class="n">jdn</span> <span class="o">-</span> <span class="mi">2121446</span>  <span class="c1"># Adjusted epoch</span>
+    <span class="n">jdn_offset</span> <span class="o">=</span> <span class="n">jdn</span> <span class="o">-</span> <span class="mi">2121445</span>  <span class="c1"># Epoch matching jalali_to_jdn</span>
 
     <span class="n">cycle_2820</span> <span class="o">=</span> <span class="n">jdn_offset</span> <span class="o">//</span> <span class="mi">1029983</span>
     <span class="n">day_in_cycle</span> <span class="o">=</span> <span class="n">jdn_offset</span> <span class="o">%</span> <span class="mi">1029983</span>
@@ -16841,27 +16841,27 @@ suitable for use as an index in pandas DataFrames and Series.</p>
         <span class="n">cycle_2820</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="n">day_in_cycle</span> <span class="o">+=</span> <span class="mi">1029983</span>
 
-    <span class="c1"># Find year within cycle</span>
-    <span class="n">year_in_cycle</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">remaining_days</span> <span class="o">=</span> <span class="n">day_in_cycle</span>
+    <span class="c1"># Find year within cycle using binary search approach</span>
+    <span class="c1"># For year b within cycle, start of year (day=1, month=1) has offset:</span>
+    <span class="c1"># 1 + ((b*682-110)//2816) + (b-1)*365</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">days_to_year_start</span><span class="p">(</span><span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">((</span><span class="n">b</span> <span class="o">*</span> <span class="mi">682</span> <span class="o">-</span> <span class="mi">110</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2816</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">365</span>
 
-    <span class="c1"># 2820 years = 683 leap years + 2137 normal years</span>
-    <span class="c1"># Use approximation then adjust</span>
-    <span class="n">year_in_cycle</span> <span class="o">=</span> <span class="p">(</span><span class="n">day_in_cycle</span> <span class="o">*</span> <span class="mi">2820</span><span class="p">)</span> <span class="o">//</span> <span class="mi">1029983</span>
-    <span class="k">if</span> <span class="n">year_in_cycle</span> <span class="o">&gt;=</span> <span class="mi">2820</span><span class="p">:</span>
-        <span class="n">year_in_cycle</span> <span class="o">=</span> <span class="mi">2819</span>
+    <span class="c1"># Binary search for the year</span>
+    <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2820</span>
+    <span class="k">while</span> <span class="n">lo</span> <span class="o">&lt;</span> <span class="n">hi</span><span class="p">:</span>
+        <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">lo</span> <span class="o">+</span> <span class="n">hi</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">days_to_year_start</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">day_in_cycle</span><span class="p">:</span>
+            <span class="n">lo</span> <span class="o">=</span> <span class="n">mid</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hi</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">-</span> <span class="mi">1</span>
 
-    <span class="c1"># Calculate days up to this year</span>
-    <span class="n">days_to_year</span> <span class="o">=</span> <span class="p">(</span><span class="n">year_in_cycle</span> <span class="o">*</span> <span class="mi">1029983</span> <span class="o">+</span> <span class="mi">2816</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2820</span>
-    <span class="k">while</span> <span class="n">days_to_year</span> <span class="o">&gt;</span> <span class="n">day_in_cycle</span><span class="p">:</span>
-        <span class="n">year_in_cycle</span> <span class="o">-=</span> <span class="mi">1</span>
-        <span class="n">days_to_year</span> <span class="o">=</span> <span class="p">(</span><span class="n">year_in_cycle</span> <span class="o">*</span> <span class="mi">1029983</span> <span class="o">+</span> <span class="mi">2816</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2820</span>
-
-    <span class="n">remaining_days</span> <span class="o">=</span> <span class="n">day_in_cycle</span> <span class="o">-</span> <span class="n">days_to_year</span>
+    <span class="n">year_in_cycle</span> <span class="o">=</span> <span class="n">lo</span>
+    <span class="n">remaining_days</span> <span class="o">=</span> <span class="n">day_in_cycle</span> <span class="o">-</span> <span class="n">days_to_year_start</span><span class="p">(</span><span class="n">year_in_cycle</span><span class="p">)</span>
 
     <span class="n">year</span> <span class="o">=</span> <span class="n">cycle_2820</span> <span class="o">*</span> <span class="mi">2820</span> <span class="o">+</span> <span class="n">year_in_cycle</span> <span class="o">+</span> <span class="mi">474</span>
 
-    <span class="c1"># Find month and day</span>
+    <span class="c1"># Find month and day from remaining_days (0-indexed day within year)</span>
     <span class="k">if</span> <span class="n">remaining_days</span> <span class="o">&lt;</span> <span class="mi">186</span><span class="p">:</span>  <span class="c1"># First 6 months (31 days each)</span>
         <span class="n">month</span> <span class="o">=</span> <span class="n">remaining_days</span> <span class="o">//</span> <span class="mi">31</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">day</span> <span class="o">=</span> <span class="n">remaining_days</span> <span class="o">%</span> <span class="mi">31</span> <span class="o">+</span> <span class="mi">1</span>
@@ -17447,8 +17447,8 @@ Weeks start on Saturday (Jalali calendar convention).</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Convert to Julian Day Number and calculate weekday</span>
     <span class="n">jdn</span> <span class="o">=</span> <span class="n">jalali_to_jdn</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">)</span>
-    <span class="c1"># JDN 0 was a Monday, so we adjust for Saturday start</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">jdn</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">7</span>
+    <span class="c1"># Adjust for Jalali weekday convention (0=Saturday, 6=Friday)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">jdn</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">7</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
