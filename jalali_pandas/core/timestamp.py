@@ -439,7 +439,18 @@ class JalaliTimestamp:
 
         year = int(data.get("year", 0) or data.get("year2", 0))
         if "year2" in data and data["year2"]:
-            year = 1300 + year if year < 100 else year
+            # Pivot around current year - 100 years window
+            # If year is 00-99, map it to 13xx or 14xx
+            # We use a simple rule: if year < 70, it's 14xx, else 13xx
+            # This is similar to how POSIX/Python does 1969-2068
+            # Jalali current year is ~1402. So 00-99 -> 1400-1499 mostly.
+            # But wait, we have history.
+            # 1357 is 1979.
+            # 57 -> 1357. 02 -> 1402.
+            # Cutoff at 1300 vs 1400.
+            # Let's say if yy < 50, it is 14yy. If yy >= 50, it is 13yy.
+            # This covers 1350 (1971) to 1449 (2070).
+            year = 1400 + year if year < 50 else 1300 + year
 
         return cls(
             year=year,
@@ -678,6 +689,19 @@ class JalaliTimestamp:
             TypeError: If timestamp is already tz-aware.
         """
         if self._tzinfo is not None:
+            if tz is None:
+                # Remove timezone (make naive)
+                return JalaliTimestamp(
+                    year=self._year,
+                    month=self._month,
+                    day=self._day,
+                    hour=self._hour,
+                    minute=self._minute,
+                    second=self._second,
+                    microsecond=self._microsecond,
+                    nanosecond=self._nanosecond,
+                    tzinfo=None,
+                )
             raise TypeError(
                 "Cannot localize tz-aware timestamp. "
                 "Use tz_convert() to convert between timezones."
@@ -689,18 +713,8 @@ class JalaliTimestamp:
             tz, ambiguous=ambiguous, nonexistent=nonexistent
         )
 
-        # Create new JalaliTimestamp with the timezone
-        return JalaliTimestamp(
-            year=self._year,
-            month=self._month,
-            day=self._day,
-            hour=self._hour,
-            minute=self._minute,
-            second=self._second,
-            microsecond=self._microsecond,
-            nanosecond=self._nanosecond,
-            tzinfo=localized.tzinfo,
-        )
+        # Use from_gregorian to respect any time shifts (e.g. DST)
+        return JalaliTimestamp.from_gregorian(localized)
 
     def tz_convert(self, tz: dt_tzinfo | str | None) -> JalaliTimestamp:
         """Convert tz-aware timestamp to another timezone.

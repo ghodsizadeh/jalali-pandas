@@ -67,7 +67,7 @@ print(jseries.jalali.month_name(locale="fa"))
 - `groupby(grouper)`
 - `resample(resample_type)` با مقادیر `month|quarter|year|week`
 - `convert_columns(columns, to_jalali=True, format="%Y-%m-%d")`
-- `to_period(freq="M")`
+- `to_period(freq="ME")`
 - `filter_by_year`, `filter_by_month`, `filter_by_quarter`, `filter_by_date_range`
 
 کلیدهای groupby:
