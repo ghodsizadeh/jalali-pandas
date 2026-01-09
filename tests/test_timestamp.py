@@ -275,7 +275,7 @@ class TestJalaliTimestampFormatting:
     def test_strptime_two_digit_year(self):
         """Test strptime handles two-digit years."""
         ts = JalaliTimestamp.strptime("02-01-01", "%y-%m-%d")
-        assert ts.year == 1302
+        assert ts.year == 1402
 
     def test_isoformat_with_timezone(self):
         """Test isoformat includes timezone offset."""

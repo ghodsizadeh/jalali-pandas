@@ -18,7 +18,7 @@ class TestJalaliDataFrame:
         """
         df = pd.DataFrame(
             {
-                "date": pd.date_range("2019-01-01", periods=10, freq="M"),
+                "date": pd.date_range("2019-01-01", periods=10, freq="ME"),
                 "value": range(10),
             }
         )

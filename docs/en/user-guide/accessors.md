@@ -67,7 +67,7 @@ Jalali columns.
 - `groupby(grouper)`
 - `resample(resample_type)` where `resample_type` is `month|quarter|year|week`
 - `convert_columns(columns, to_jalali=True, format="%Y-%m-%d")`
-- `to_period(freq="M")`
+- `to_period(freq="ME")`
 - `filter_by_year`, `filter_by_month`, `filter_by_quarter`, `filter_by_date_range`
 
 Supported groupby keys:

@@ -48,7 +48,34 @@ class JalaliMonthBegin(JalaliOffset):
         """Roll forward to next month start if not already on one."""
         if self.is_on_offset(dt):
             return dt
-        return self.__add__(dt)
+
+        # Always move forward by 1 month to find the next offset, regardless of n
+        # Logic:
+        # 1. If we use self.__add__(dt), it adds n months.
+        # 2. But rollforward implies snapping to the grid or next occurrence.
+        #    If n=1, next occurrence is +1 month (day 1).
+        #    If n>1, does it mean next occurrence in the stride?
+        #    Pandas behavior: MonthBegin(2).rollforward(dt) moves to the next MonthBegin.
+        #    It seems pandas treats rollforward as "next offset occurrence" which is usually 1 step away?
+        #    Actually, pandas ignores n for rollforward/rollback.
+
+        # We manually construct the next month start
+        total_months = dt.year * 12 + dt.month - 1 + 1  # Add 1 month
+        new_year = total_months // 12
+        new_month = total_months % 12 + 1
+
+        from jalali_pandas.core.timestamp import JalaliTimestamp
+        return JalaliTimestamp(
+            year=new_year,
+            month=new_month,
+            day=1,
+            hour=dt.hour if not self._normalize else 0,
+            minute=dt.minute if not self._normalize else 0,
+            second=dt.second if not self._normalize else 0,
+            microsecond=dt.microsecond if not self._normalize else 0,
+            nanosecond=dt.nanosecond if not self._normalize else 0,
+            tzinfo=dt.tzinfo,
+        )
 
     def rollback(self, dt: JalaliTimestamp) -> JalaliTimestamp:
         """Roll back to previous month start."""
